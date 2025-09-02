@@ -26,6 +26,16 @@
                             aria-current="true">{{ trans('labels.seo_settings') }}
                             <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
                         </a>
+                        <a href="#google_tag_settings" data-tab="google_tag_settings"
+                           class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                           aria-current="true">{{ trans('labels.google_tag_settings') }}
+                            <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                        </a>
+                        <a href="#facebook_pixel_settings" data-tab="facebook_pixel_settings"
+                           class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                           aria-current="true">{{ trans('labels.facebook_pixel_settings') }}
+                            <i class="fa-regular fa-angle-{{ session()->get('direction') == '2' ? 'left' : 'right' }}"></i>
+                        </a>
                         @if (@helper::checkaddons('notification'))
                             <a href="#noti_settings" data-tab="noti_settings"
                                 class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
@@ -632,6 +642,84 @@
                                                     class="form-group {{ session()->get('direction') == '2' ? 'text-start' : 'text-end' }}">
                                                     <button class="btn btn-primary"
                                                         @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" name="seo_update" value="1" @endif>{{ trans('labels.save') }}</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="google_tag_settings">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="card border-0 box-shadow">
+                                    <div class="card-header p-3 bg-secondary">
+                                        <h5 class="text-white">
+                                            {{ trans('labels.google_tag_settings') }}
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="{{ URL::to('admin/settings/update') }}" method="post"
+                                              enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="col-form-label"
+                                                               for="">{{ trans('labels.google_tag_script') }}</label>
+                                                        <textarea class="form-control" name="google_tag_script" placeholder="{{ trans('labels.google_tag_script') }}"
+                                                                  id="google_tag_script" rows="6">{{ @$getsettings->google_tag_script == '' ? old('og_description') : @$getsettings->google_tag_script }}</textarea>
+                                                        @error('google_tag_script')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div
+                                                        class="form-group {{ session()->get('direction') == '2' ? 'text-start' : 'text-end' }}">
+                                                    <button class="btn btn-primary"
+                                                            @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" name="google_tag_update" value="1" @endif>{{ trans('labels.save') }}</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="facebook_pixel_settings">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="card border-0 box-shadow">
+                                    <div class="card-header p-3 bg-secondary">
+                                        <h5 class="text-white">
+                                            {{ trans('labels.facebook_pixel_settings') }}
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="{{ URL::to('admin/settings/update') }}" method="post"
+                                              enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="col-form-label"
+                                                               for="">{{ trans('labels.facebook_pixel_script') }}</label>
+                                                        <textarea class="form-control" name="facebook_pixel_script" placeholder="{{ trans('labels.facebook_pixel_script') }}"
+                                                                  id="facebook_pixel_script" rows="6">{{ @$getsettings->facebook_pixel_script == '' ? old('og_description') : @$getsettings->facebook_pixel_script }}</textarea>
+                                                        @error('facebook_pixel_script')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div
+                                                        class="form-group {{ session()->get('direction') == '2' ? 'text-start' : 'text-end' }}">
+                                                    <button class="btn btn-primary"
+                                                            @if (env('Environment') == 'sendbox') type="button" onclick="myFunction()" @else type="submit" name="facebook_pixel_update" value="1" @endif>{{ trans('labels.save') }}</button>
                                                 </div>
                                             </div>
                                         </form>

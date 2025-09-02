@@ -51,6 +51,22 @@ class SettingController extends Controller
             $setting->address_url = $request->address_url;
             $setting->save();
         }
+        if ($request->google_tag_update) {
+            $setting = Settings::first();
+            if (empty($setting)) {
+                $setting = new Settings();
+            }
+            $setting->google_tag_script = $request->google_tag_script;
+            $setting->save();
+        }
+        if ($request->facebook_pixel_update) {
+            $setting = Settings::first();
+            if (empty($setting)) {
+                $setting = new Settings();
+            }
+            $setting->facebook_pixel_script = $request->facebook_pixel_script;
+            $setting->save();
+        }
         if ($request->firebase_key_update) {
             $setting = Settings::first();
             if (empty($setting)) {

@@ -29,6 +29,18 @@
 
                             <i class="fa-regular fa-angle-<?php echo e(session()->get('direction') == '2' ? 'left' : 'right'); ?>"></i>
                         </a>
+                        <a href="#google_tag_settings" data-tab="google_tag_settings"
+                           class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                           aria-current="true"><?php echo e(trans('labels.google_tag_settings')); ?>
+
+                            <i class="fa-regular fa-angle-<?php echo e(session()->get('direction') == '2' ? 'left' : 'right'); ?>"></i>
+                        </a>
+                        <a href="#facebook_pixel_settings" data-tab="facebook_pixel_settings"
+                           class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
+                           aria-current="true"><?php echo e(trans('labels.facebook_pixel_settings')); ?>
+
+                            <i class="fa-regular fa-angle-<?php echo e(session()->get('direction') == '2' ? 'left' : 'right'); ?>"></i>
+                        </a>
                         <?php if(@helper::checkaddons('notification')): ?>
                             <a href="#noti_settings" data-tab="noti_settings"
                                 class="list-group-item basicinfo p-3 list-item-secondary d-flex justify-content-between align-items-center"
@@ -700,6 +712,100 @@ unset($__errorArgs, $__bag); ?>
                                                     class="form-group <?php echo e(session()->get('direction') == '2' ? 'text-start' : 'text-end'); ?>">
                                                     <button class="btn btn-primary"
                                                         <?php if(env('Environment') == 'sendbox'): ?> type="button" onclick="myFunction()" <?php else: ?> type="submit" name="seo_update" value="1" <?php endif; ?>><?php echo e(trans('labels.save')); ?></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="google_tag_settings">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="card border-0 box-shadow">
+                                    <div class="card-header p-3 bg-secondary">
+                                        <h5 class="text-white">
+                                            <?php echo e(trans('labels.google_tag_settings')); ?>
+
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="<?php echo e(URL::to('admin/settings/update')); ?>" method="post"
+                                              enctype="multipart/form-data">
+                                            <?php echo csrf_field(); ?>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="col-form-label"
+                                                               for=""><?php echo e(trans('labels.google_tag_script')); ?></label>
+                                                        <textarea class="form-control" name="google_tag_script" placeholder="<?php echo e(trans('labels.google_tag_script')); ?>"
+                                                                  id="google_tag_script" rows="6"><?php echo e(@$getsettings->google_tag_script == '' ? old('og_description') : @$getsettings->google_tag_script); ?></textarea>
+                                                        <?php $__errorArgs = ['google_tag_script'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                        <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div
+                                                        class="form-group <?php echo e(session()->get('direction') == '2' ? 'text-start' : 'text-end'); ?>">
+                                                    <button class="btn btn-primary"
+                                                            <?php if(env('Environment') == 'sendbox'): ?> type="button" onclick="myFunction()" <?php else: ?> type="submit" name="google_tag_update" value="1" <?php endif; ?>><?php echo e(trans('labels.save')); ?></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="facebook_pixel_settings">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="card border-0 box-shadow">
+                                    <div class="card-header p-3 bg-secondary">
+                                        <h5 class="text-white">
+                                            <?php echo e(trans('labels.facebook_pixel_settings')); ?>
+
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="<?php echo e(URL::to('admin/settings/update')); ?>" method="post"
+                                              enctype="multipart/form-data">
+                                            <?php echo csrf_field(); ?>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="col-form-label"
+                                                               for=""><?php echo e(trans('labels.facebook_pixel_script')); ?></label>
+                                                        <textarea class="form-control" name="facebook_pixel_script" placeholder="<?php echo e(trans('labels.facebook_pixel_script')); ?>"
+                                                                  id="facebook_pixel_script" rows="6"><?php echo e(@$getsettings->facebook_pixel_script == '' ? old('og_description') : @$getsettings->facebook_pixel_script); ?></textarea>
+                                                        <?php $__errorArgs = ['facebook_pixel_script'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                        <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div
+                                                        class="form-group <?php echo e(session()->get('direction') == '2' ? 'text-start' : 'text-end'); ?>">
+                                                    <button class="btn btn-primary"
+                                                            <?php if(env('Environment') == 'sendbox'): ?> type="button" onclick="myFunction()" <?php else: ?> type="submit" name="facebook_pixel_update" value="1" <?php endif; ?>><?php echo e(trans('labels.save')); ?></button>
                                                 </div>
                                             </div>
                                         </form>
