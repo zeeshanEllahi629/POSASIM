@@ -36,6 +36,44 @@
             --bs-primary: {{ @helper::appdata()->admin_primary_color != null ? @helper::appdata()->admin_primary_color : '#01112B' }};
             --bs-secondary: {{ @helper::appdata()->admin_secondary_color != null ? @helper::appdata()->admin_secondary_color : '#0a98af' }};
         }
+        /* Ensure sidebar allows overflow */
+        .sidebar {
+            overflow: hidden !important;
+        }
+
+        /* Enable scrollbar on the UL */
+        .sidebar ul {
+            max-height: calc(100vh - 100px) !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        /* Scrollbar styling */
+        .sidebar ul::-webkit-scrollbar {
+            width: 10px !important;
+        }
+
+        .sidebar ul::-webkit-scrollbar-track {
+            background: #000 !important; /* Match sidebar background */
+            border-radius: 10px !important;
+        }
+
+        .sidebar ul::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff3b3b, #c40000) !important; /* Red gradient for contrast */
+            border-radius: 10px !important;
+            border: 2px solid #000 !important; /* Creates visible edges on black background */
+        }
+
+        .sidebar ul::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ff5555, #e60000) !important;
+        }
+
+        /* Firefox scrollbar */
+        .sidebar ul {
+            scrollbar-width: thin !important;
+            scrollbar-color: #e50914 #000 !important;
+        }
+
     </style>
     @yield('styles')
 </head>

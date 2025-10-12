@@ -16,6 +16,7 @@ return [
     "google_tag_script" => "Google Tags Script",
     "facebook_pixel_settings" => "Facebook Pixel Settings",
     "facebook_pixel_script" => "Facebook Pixel Script",
+    "assign_order" => "Assign Driver",
     "apply" => "Apply",
     "copy" => "Copy",
     "delivery_charge_per_km" => "Delivery Charge (Per KM)",

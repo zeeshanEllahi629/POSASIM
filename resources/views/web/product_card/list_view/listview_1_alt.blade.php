@@ -73,7 +73,10 @@
                         @endif
                     </div>
                 </h5>
-                <div class="item-card-footer-2 pt-2">
+                    @if(!empty($itemdata->item_description))
+                        <p class="text-muted" style="font-size: 13px; margin-bottom: 0;">{{$itemdata->item_description}}</p>
+                    @endif
+                    <div class="item-card-footer-2 pt-1">
                     <div class="d-sm-flex justify-content-between gap-2 align-items-center">
                         <div class="d-flex justify-content-between align-items-center gap-2">
                             <p class="fs-6 fw-500 m-0">

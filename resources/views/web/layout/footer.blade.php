@@ -96,7 +96,14 @@
                                 <div class="col-md-4 col-lg-4 col-xl-4 col-12 mb-4 mb-sm-0">
                                     <h4>{{ trans('labels.help_contact_us') }}</h4>
                                     <ul class="contact-detail">
-                                        <a href="callto:{{ helper::appdata()->mobile }}">
+                                        <a target="_blank" href="{{ helper::appdata()->address_url }}">
+                                            <li class="d-flex align-items-center text-white">
+                                                <i
+                                                        class="fa-light fa-map-marker {{ session()->get('direction') == '2' ? 'ms-2' : 'me-2' }}"></i>
+                                                <p class="mb-0">{{ helper::appdata()->address }}</p>
+                                            </li>
+                                        </a>
+                                        <a href="tel:{{ helper::appdata()->mobile }}">
                                             <li class="d-flex align-items-center text-white">
                                                 <i
                                                     class="fa-light fa-phone {{ session()->get('direction') == '2' ? 'ms-2' : 'me-2' }}"></i>

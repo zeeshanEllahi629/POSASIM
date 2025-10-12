@@ -128,7 +128,7 @@ class OrderController extends Controller
             $title = trans('messages.driver_assigned_title');
             $body = 'Delivery boy' . $driver_info->name . ' has been assigned to your Order ' . $orderdata->order_number;
             $message_text = 'Delivery boy ' . $driver_info->name . ' has been assigned to your Order ' . $orderdata->order_number;
-            $noti = helper::push_notification($user_info->token, $title, $body, "order", $orderdata->id);
+//            $noti = helper::push_notification($user_info->token, $title, $body, "order", $orderdata->id);
 
             if (@helper::checkaddons('otp')) {
                 $status_sms = sms_helper::order_status_sms($user_info->email, $user_info->name, $title, $message_text);
@@ -142,7 +142,7 @@ class OrderController extends Controller
         $title = trans('messages.new_order_assigned_title');
         $body = 'New Order ' . $orderdata->order_number . ' assigned to you';
         $message_text = 'New order ' . $orderdata->order_number . ' has been assigned to you.';
-        $noti = helper::push_notification($driver_info->token, $title, $body, "order", $orderdata->id);
+//        $noti = helper::push_notification($driver_info->token, $title, $body, "order", $orderdata->id);
 
 
         $status_email = helper::order_status_email($driver_info->email, $driver_info->name, $title, $message_text);

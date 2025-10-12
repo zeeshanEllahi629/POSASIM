@@ -4,10 +4,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12 my-2 d-flex justify-content-end">
-                {{-- @if ($getdriver->count() > 0)
+                @if ($getdriver->count() > 0)
                     @if ($orderdata->order_type == 1 && ($orderdata->status_type == 1 || $orderdata->status_type == 2))
                         <select class="form-select w-25 mx-1" name="driver" id="driver" tooltip="assign deliveryman">
-                            <option value="0">{{ trans('labels.select') }}</option>
+                            <option value="0">{{ trans('labels.assign_order') }}</option>
                             @foreach ($getdriver as $driver)
                                 <option value="{{ $driver->id }}"
                                     {{ $orderdata->driver_id == $driver->id ? 'selected' : '' }}>{{ $driver->name }}
@@ -15,7 +15,7 @@
                             @endforeach
                         </select>
                     @endif
-                @endif --}}
+                @endif
                 @if ($orderdata->status_type == 1 || $orderdata->status_type == 2)
                     <button type="button" class="btn btn-dark dropdown-toggle px-4 py-2"
                         data-bs-toggle="dropdown">{{ @helper::gettype($orderdata->status, $orderdata->status_type, $orderdata->order_type)->name == null ? trans('labels.action') : @helper::gettype($orderdata->status, $orderdata->status_type, $orderdata->order_type)->name }}</button>
@@ -515,7 +515,10 @@
                     if (response.status == 0) {
                         toastr.error(response.message);
                     } else {
-                        location.reload();
+                        toastr.success(response.message);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
                     }
                 }
             });

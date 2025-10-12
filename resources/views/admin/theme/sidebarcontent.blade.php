@@ -415,13 +415,13 @@
             </li>
         @endif
     @endif
-    {{-- <li class="nav-item mb-2 fs-7 {{ @Auth::user()->type != 1 ? (in_array('18', $modules) == true ? '' : 'd-none') : '' }}"
+    <li class="nav-item mb-2 fs-7 {{ @Auth::user()->type != 1 ? (in_array('18', $modules) == true ? '' : 'd-none') : '' }}"
         id="18">
         <a class="nav-link rounded d-flex {{ request()->is('admin/driver*') ? 'active' : '' }}"
             href="{{ URL::to('/admin/driver') }}" aria-expanded="false">
             <i class="fa-solid fa-motorcycle"></i><span class="nav-text ">{{ trans('labels.drivers') }}</span>
         </a>
-    </li> --}}
+    </li>
     @if (@helper::checkaddons('role_management'))
         @if (@Auth::user()->type != 1)
             @if (in_array('19', $modules) || in_array('20', $modules))
