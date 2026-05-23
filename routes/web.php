@@ -446,6 +446,21 @@ Route::group(['prefix' => 'admin', 'namespace' => 'admin'], function () {
 		Route::post('purchase/store', [\App\Http\Controllers\admin\PurchaseController::class, 'store']);
 		Route::get('purchase/show/{id}', [\App\Http\Controllers\admin\PurchaseController::class, 'show']);
 		Route::post('purchase/update-payment/{id}', [\App\Http\Controllers\admin\PurchaseController::class, 'updatePaymentStatus']);
+		
+		// ============================
+		// ANALYTICS & REPORTS ROUTES
+		// ============================
+		Route::get('analytics', [\App\Http\Controllers\admin\AnalyticsController::class, 'dashboard']);
+		Route::get('analytics/sales-report', [\App\Http\Controllers\admin\AnalyticsController::class, 'salesReport']);
+		Route::get('analytics/product-report', [\App\Http\Controllers\admin\AnalyticsController::class, 'productReport']);
+
+		// ============================
+		// ACCOUNTING & FINANCE ROUTES
+		// ============================
+		Route::get('accounting', [\App\Http\Controllers\admin\AccountingController::class, 'dashboard']);
+		Route::get('accounting/expenses', [\App\Http\Controllers\admin\AccountingController::class, 'expenses']);
+		Route::post('accounting/expenses/store', [\App\Http\Controllers\admin\AccountingController::class, 'storeExpense']);
+		Route::get('accounting/profit-loss', [\App\Http\Controllers\admin\AccountingController::class, 'profitLoss']);
 	});
 	Route::get('logout', [AdminController::class, 'logout']);
 });
