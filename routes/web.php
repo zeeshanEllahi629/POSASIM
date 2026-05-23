@@ -415,6 +415,37 @@ Route::group(['prefix' => 'admin', 'namespace' => 'admin'], function () {
 		Route::get('createsystem-addons', [SystemAddonsController::class, 'createsystemaddons']);
 		Route::post('systemaddons/store', [SystemAddonsController::class, 'store']);
 		Route::post('systemaddons/update', [SystemAddonsController::class, 'update']);
+
+		// ============================
+		// INVENTORY MANAGEMENT ROUTES
+		// ============================
+		Route::get('inventory', [\App\Http\Controllers\admin\InventoryController::class, 'dashboard']);
+		Route::get('inventory/stock', [\App\Http\Controllers\admin\InventoryController::class, 'stockList']);
+		Route::get('inventory/adjust/{id}', [\App\Http\Controllers\admin\InventoryController::class, 'adjustStock']);
+		Route::post('inventory/adjust/{id}', [\App\Http\Controllers\admin\InventoryController::class, 'adjustStock']);
+		Route::get('inventory/history', [\App\Http\Controllers\admin\InventoryController::class, 'stockHistory']);
+		Route::get('inventory/alerts', [\App\Http\Controllers\admin\InventoryController::class, 'lowStockAlerts']);
+
+		// ============================
+		// SUPPLIER MANAGEMENT ROUTES
+		// ============================
+		Route::get('supplier', [\App\Http\Controllers\admin\SupplierController::class, 'index']);
+		Route::get('supplier/add', [\App\Http\Controllers\admin\SupplierController::class, 'add']);
+		Route::post('supplier/store', [\App\Http\Controllers\admin\SupplierController::class, 'store']);
+		Route::get('supplier/show/{id}', [\App\Http\Controllers\admin\SupplierController::class, 'show']);
+		Route::post('supplier/update/{id}', [\App\Http\Controllers\admin\SupplierController::class, 'update']);
+		Route::get('supplier/delete', [\App\Http\Controllers\admin\SupplierController::class, 'delete']);
+		Route::get('supplier/status', [\App\Http\Controllers\admin\SupplierController::class, 'status']);
+		Route::get('supplier/details/{id}', [\App\Http\Controllers\admin\SupplierController::class, 'details']);
+
+		// ============================
+		// PURCHASE ORDER ROUTES
+		// ============================
+		Route::get('purchase', [\App\Http\Controllers\admin\PurchaseController::class, 'index']);
+		Route::get('purchase/create', [\App\Http\Controllers\admin\PurchaseController::class, 'create']);
+		Route::post('purchase/store', [\App\Http\Controllers\admin\PurchaseController::class, 'store']);
+		Route::get('purchase/show/{id}', [\App\Http\Controllers\admin\PurchaseController::class, 'show']);
+		Route::post('purchase/update-payment/{id}', [\App\Http\Controllers\admin\PurchaseController::class, 'updatePaymentStatus']);
 	});
 	Route::get('logout', [AdminController::class, 'logout']);
 });
