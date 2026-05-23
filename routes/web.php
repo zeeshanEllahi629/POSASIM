@@ -460,7 +460,33 @@ Route::group(['prefix' => 'admin', 'namespace' => 'admin'], function () {
 		Route::get('accounting', [\App\Http\Controllers\admin\AccountingController::class, 'dashboard']);
 		Route::get('accounting/expenses', [\App\Http\Controllers\admin\AccountingController::class, 'expenses']);
 		Route::post('accounting/expenses/store', [\App\Http\Controllers\admin\AccountingController::class, 'storeExpense']);
-		Route::get('accounting/profit-loss', [\App\Http\Controllers\admin\AccountingController::class, 'profitLoss']);
+		// ============================
+		// MULTI-BRANCH ROUTES
+		// ============================
+		Route::get('branch', [\App\Http\Controllers\admin\BranchController::class, 'index']);
+		Route::get('branch/add', [\App\Http\Controllers\admin\BranchController::class, 'add']);
+		Route::post('branch/store', [\App\Http\Controllers\admin\BranchController::class, 'store']);
+		Route::get('branch/edit/{id}', [\App\Http\Controllers\admin\BranchController::class, 'edit']);
+		Route::post('branch/update/{id}', [\App\Http\Controllers\admin\BranchController::class, 'update']);
+		Route::get('branch/status', [\App\Http\Controllers\admin\BranchController::class, 'status']);
+		Route::get('branch/delete', [\App\Http\Controllers\admin\BranchController::class, 'delete']);
+
+		// ============================
+		// SALES AGENTS ROUTES
+		// ============================
+		Route::get('sales-agents', [\App\Http\Controllers\admin\SalesAgentController::class, 'index']);
+		Route::get('sales-agents/add', [\App\Http\Controllers\admin\SalesAgentController::class, 'add']);
+		Route::post('sales-agents/store', [\App\Http\Controllers\admin\SalesAgentController::class, 'store']);
+		Route::get('sales-agents/edit/{id}', [\App\Http\Controllers\admin\SalesAgentController::class, 'edit']);
+		Route::post('sales-agents/update/{id}', [\App\Http\Controllers\admin\SalesAgentController::class, 'update']);
+		Route::get('sales-agents/status', [\App\Http\Controllers\admin\SalesAgentController::class, 'status']);
+		Route::get('sales-agents/delete', [\App\Http\Controllers\admin\SalesAgentController::class, 'delete']);
+
+		// ============================
+		// CUSTOMER LOYALTY ROUTES
+		// ============================
+		Route::get('loyalty', [\App\Http\Controllers\admin\LoyaltyController::class, 'index']);
+		Route::post('loyalty/adjust', [\App\Http\Controllers\admin\LoyaltyController::class, 'adjustPoints']);
 	});
 	Route::get('logout', [AdminController::class, 'logout']);
 });

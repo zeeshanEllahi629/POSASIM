@@ -3,31 +3,34 @@
    Dark theme, professional, touch-optimized
    ============================================= */
 
-/* ---------- CSS Variables ---------- */
+/* ---------- Neon Pulse Theme Variables ---------- */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
 :root {
-    --bg-primary: #0f0f1a;
-    --bg-secondary: #1a1a2e;
-    --bg-card: #16213e;
-    --bg-input: #1e2a45;
-    --bg-hover: #1e3a5f;
-    --accent: #0f3460;
-    --primary: #00b894;
-    --primary-hover: #00a381;
-    --danger: #e74c3c;
-    --danger-hover: #c0392b;
-    --warning: #f39c12;
-    --warning-hover: #e67e22;
-    --info: #3498db;
-    --info-hover: #2980b9;
-    --text-primary: #ffffff;
-    --text-secondary: #a0aec0;
-    --text-muted: #636e7b;
-    --border: #2d3748;
-    --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    --bg-primary: #0a0a0a;     /* True Black */
+    --bg-secondary: #121212;   /* Deep Charcoal */
+    --bg-card: #1a1a1a;        /* Surface Panels */
+    --bg-input: #242424;       /* Slightly lighter for inputs */
+    --bg-hover: #2a2a2a;       
+    --accent: #00e676;         /* Neon Green Accent */
+    --primary: #00e676;        /* Neon Green Primary */
+    --primary-hover: #00c853;  /* Darker Neon Green */
+    --danger: #ff1744;         /* Crimson Red */
+    --danger-hover: #d50000;   /* Darker Crimson */
+    --warning: #ffea00;        /* Bright Yellow */
+    --warning-hover: #ffd600;  
+    --info: #00b0ff;           /* Bright Blue */
+    --info-hover: #0091ea;     
+    --text-primary: #ffffff;   /* Pure White */
+    --text-secondary: #e0e0e0; /* Off White */
+    --text-muted: #9e9e9e;     /* Grey */
+    --border: #333333;         /* Sharp borders */
+    --shadow: 0 4px 20px rgba(0, 230, 118, 0.15); /* Green tinted shadow */
     --radius: 12px;
     --radius-sm: 8px;
-    --transition: all 0.2s ease;
-    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --font: 'JetBrains Mono', monospace;
+    --font-heading: 'Outfit', sans-serif;
 }
 
 /* ---------- Reset ---------- */
@@ -518,12 +521,13 @@ body {
     padding: 12px;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
     transition: var(--transition);
-    font-family: var(--font);
+    font-family: var(--font-heading);
     position: relative;
+    letter-spacing: 0.5px;
 }
 .btn-action:active { transform: scale(0.96); }
 
@@ -610,11 +614,12 @@ body {
     border-bottom: 1px solid var(--border);
 }
 .modal-header h3 {
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 10px;
+    font-family: var(--font-heading);
 }
 .modal-header h3 i { color: var(--primary); }
 
