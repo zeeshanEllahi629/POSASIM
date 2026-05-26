@@ -12,7 +12,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "POS & Admin Dashboard",
+  title: "Foodefy",
   description: "Modern POS and Admin dashboard",
 };
 
