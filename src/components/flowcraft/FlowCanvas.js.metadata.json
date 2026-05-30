@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_OTHER",
+  "summary":  "Rewrite FlowCanvas to use DynamicNode and NodeRegistry with right panel inspector",
+  "updatedAt":  "2026-05-27T15:49:14.039803700Z"
+}

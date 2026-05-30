@@ -1,0 +1,21 @@
+{
+  "name": "Foodefy POS System",
+  "short_name": "Foodefy POS",
+  "description": "Desktop Point of Sale System",
+  "start_url": "/admin/pos",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00e676",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/apple-icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    }
+  ]
+}

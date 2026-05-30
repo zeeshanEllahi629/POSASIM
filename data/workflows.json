@@ -1,0 +1,32 @@
+{
+  "website-agent": {
+    "nodes": [
+      {
+        "id": "trigger-1",
+        "type": "webhookTrigger",
+        "position": { "x": 100, "y": 100 },
+        "data": { "label": "Website Chat Trigger", "category": "Triggers", "webhookMethod": "POST" }
+      },
+      {
+        "id": "ai-1",
+        "type": "aiBrain",
+        "position": { "x": 400, "y": 100 },
+        "data": { 
+          "label": "AI Brain", 
+          "category": "AI Models", 
+          "llmBaseUrl": "https://api.openai.com/v1",
+          "modelName": "gpt-4o-mini",
+          "systemPrompt": "You are a helpful customer support agent for Foodefy POS system.",
+          "userPrompt": "{{payload.webhook.body.text}}"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1-2",
+        "source": "trigger-1",
+        "target": "ai-1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1402 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model about {
+  id            Int      @id @default(autoincrement())
+  about_content String?  @db.LongText
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model addons {
+  id            Int       @id @default(autoincrement())
+  reorder_id    Int
+  addongroup_id Int
+  name          String    @db.VarChar(50)
+  price         String    @default("0") @db.VarChar(20)
+  is_available  Int       @default(1)
+  is_deleted    Int       @default(2)
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model addons_group {
+  id              Int       @id @default(autoincrement())
+  reorder_id      Int
+  name            String    @db.Text
+  selection_type  Int
+  selection_count Int
+  min_count       Int       @default(1)
+  max_count       Int
+  is_available    Int       @default(1)
+  is_deleted      Int       @default(2)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model address {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  address_type Int?
+  address      String   @db.Text
+  title        String?  @db.VarChar(255)
+  landmark     String?  @db.VarChar(255)
+  postal_code  String   @db.VarChar(255)
+  country      String?  @db.VarChar(255)
+  state        String?  @db.VarChar(255)
+  city         String?  @db.VarChar(255)
+  is_default   Int
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model age_verification {
+  id                      Int      @id @default(autoincrement())
+  age_verification_on_off Int?
+  popup_type              String?  @db.VarChar(255)
+  min_age                 Int
+  created_at              DateTime @default(now()) @db.Timestamp(0)
+  updated_at              DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model banner {
+  id           Int       @id @default(autoincrement())
+  reorder_id   Int
+  item_id      Int?
+  cat_id       Int?
+  type         String?   @db.VarChar(10)
+  image        String    @db.VarChar(255)
+  is_available Int       @default(1)
+  section      Int       @default(0)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+}
+
+model blogs {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  reorder_id  Int
+  slug        String    @db.LongText
+  image       String    @db.VarChar(255)
+  title       String    @db.VarChar(255)
+  description String    @db.LongText
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model bookings {
+  id               Int       @id @default(autoincrement()) @db.UnsignedInt
+  booking_number   String    @db.VarChar(255)
+  name             String    @db.VarChar(255)
+  email            String    @db.VarChar(255)
+  mobile           String    @db.VarChar(255)
+  guests           Int
+  date             String    @db.VarChar(255)
+  time             String    @db.VarChar(255)
+  reservation_type String    @db.VarChar(255)
+  special_request  String?   @db.VarChar(255)
+  status           Int
+  table_number     Int?
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cart {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id            BigInt?   @db.UnsignedBigInt
+  session_id         String?   @db.Text
+  item_id            String    @db.VarChar(255)
+  item_name          String    @db.VarChar(255)
+  item_image         String    @db.VarChar(255)
+  item_type          Int?
+  addons_id          String?   @db.VarChar(255)
+  addons_name        String?   @db.VarChar(255)
+  addons_price       String?   @db.VarChar(255)
+  addons_total_price Float?    @default(0) @db.Float
+  qty                Int
+  item_price         String    @db.VarChar(255)
+  tax                String?   @db.VarChar(255)
+  is_available       Int       @default(1)
+  extras_id          String?   @db.VarChar(255)
+  extras_name        String?   @db.VarChar(255)
+  extras_price       String?   @db.VarChar(255)
+  extras_total_price Int?
+  buynow             Int?
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model categories {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  reorder_id    Int
+  category_name String    @db.VarChar(255)
+  slug          String    @db.VarChar(255)
+  image         String    @db.VarChar(255)
+  is_available  Int       @default(1)
+  is_deleted    Int       @default(2)
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+}
+
+model contact {
+  id         Int      @id @default(autoincrement())
+  product_id Int?
+  firstname  String   @db.VarChar(50)
+  lastname   String   @db.VarChar(50)
+  email      String   @db.VarChar(255)
+  mobile     String?  @db.VarChar(255)
+  message    String   @db.Text
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model custom_status {
+  id           Int      @id @default(autoincrement())
+  reorder_id   Int
+  name         String   @db.VarChar(255)
+  type         Int
+  is_available Int      @default(1)
+  is_deleted   Int      @default(2)
+  order_type   Int      @default(1)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model extras {
+  id         Int      @id @default(autoincrement())
+  item_id    Int
+  name       String   @db.VarChar(255)
+  price      Float    @db.Float
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model faqs {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  reorder_id  Int
+  title       String    @db.VarChar(255)
+  description String    @db.LongText
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model favorite {
+  id         BigInt    @id @default(autoincrement())
+  user_id    BigInt
+  item_id    BigInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model footer_features {
+  id          Int      @id @default(autoincrement())
+  icon        String   @db.VarChar(255)
+  title       String   @db.Text
+  description String   @db.Text
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model galleries {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  image      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model global_extras {
+  id           Int      @id @default(autoincrement())
+  branch_id    Int
+  reorder_id   Int
+  name         String   @db.Text
+  price        String   @db.Text
+  is_available Int      @default(1)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model item {
+  id                  BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  reorder_id          Int
+  cat_id              Int
+  subcat_id           Int
+  item_name           String    @db.VarChar(255)
+  slug                String    @db.VarChar(255)
+  sku                 String?   @db.VarChar(100)
+  brand_id            Int?      @db.UnsignedInt
+  unit_id             Int?      @db.UnsignedInt
+  warranty_id         Int?      @db.UnsignedInt
+  branch_id           Int?      @db.UnsignedInt
+  alert_quantity      Int?      @default(0)
+  barcode_type        String?   @default("C128") @db.VarChar(50)
+  enable_description  Int?      @default(1)
+  tax_type            String?   @default("inclusive") @db.VarChar(20)
+  product_type        String?   @default("single") @db.VarChar(20)
+  label_print         Int?      @default(1)
+  image               String?   @db.VarChar(255)
+  item_type           Int?
+  has_extras          Int?      @default(2)
+  price               Float?    @default(0) @db.Float
+  qty                 Int?
+  original_price      String?   @default("0") @db.VarChar(255)
+  addons_id           String?   @db.VarChar(255)
+  item_description    String?   @db.LongText
+  item_allergens      String?   @db.LongText
+  preparation_time    String?   @db.VarChar(255)
+  tax                 String    @db.VarChar(255)
+  video_url           String?   @db.VarChar(255)
+  avg_ratting         Float     @db.Float
+  discount_percentage Float     @db.Float
+  item_status         Int       @default(1)
+  is_featured         Int?      @default(2)
+  is_top_deals        Int       @default(2)
+  created_at          DateTime? @db.Timestamp(0)
+  updated_at          DateTime? @db.Timestamp(0)
+}
+
+model item_images {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  item_id    BigInt    @db.UnsignedBigInt
+  image      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([item_id], map: "item_images_item_id_foreign")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model languages {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  code         String    @db.VarChar(255)
+  name         String    @db.VarChar(255)
+  image        String    @db.VarChar(255)
+  layout       Int       @default(1)
+  is_default   Int       @default(2)
+  is_available Int       @default(1)
+  is_deleted   Int       @default(2)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model manage_roles {
+  id           Int       @id @default(autoincrement()) @db.UnsignedInt
+  name         String    @db.VarChar(255)
+  titles       String?   @db.Text
+  modules      String    @db.VarChar(255)
+  is_available Boolean
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model model_has_roles {
+  role_id    BigInt @db.UnsignedBigInt
+  model_type String
+  model_id   BigInt @db.UnsignedBigInt
+
+  @@id([role_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_roles_model_id_model_type_index")
+}
+
+model notification {
+  id         Int      @id @default(autoincrement())
+  title      String   @db.VarChar(255)
+  cat_id     Int?
+  item_id    Int?
+  message    String   @db.Text
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model order {
+  id                        BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  branch_id                 BigInt?             @db.UnsignedBigInt
+  order_number              String              @db.VarChar(100)
+  order_number_digit        String?             @db.VarChar(255)
+  order_number_start        String?             @db.VarChar(255)
+  user_id                   BigInt?             @db.UnsignedBigInt
+  name                      String?             @db.VarChar(255)
+  email                     String?             @db.VarChar(255)
+  mobile                    BigInt?
+  driver_id                 Int?
+  order_type                String              @default("1") @db.VarChar(11)
+  address_type              String?             @db.VarChar(10)
+  address                   String?             @db.VarChar(255)
+  landmark                  String?             @db.VarChar(255)
+  city                      String?             @db.VarChar(255)
+  state                     String?             @db.VarChar(255)
+  country                   String?             @db.VarChar(255)
+  postal_code               String?             @db.VarChar(255)
+  offer_code                String?             @db.VarChar(50)
+  discount_amount           String?             @default("0.00") @db.VarChar(50)
+  delivery_charge           String?             @default("0.00") @db.VarChar(50)
+  shipping_area             String?             @db.VarChar(255)
+  tax_amount                String?             @default("0.00") @db.VarChar(50)
+  tax_name                  String?             @db.VarChar(255)
+  grand_total               String              @db.VarChar(255)
+  tips                      String?             @db.VarChar(255)
+  transaction_id            String?             @db.VarChar(255)
+  transaction_type          String              @db.VarChar(255)
+  payment_status            Int
+  status                    String              @db.VarChar(11)
+  status_type               Int?
+  order_from                String?             @db.VarChar(10)
+  is_notification           Int                 @default(1)
+  order_notes               String?             @db.Text
+  delivery_date             String?             @db.VarChar(255)
+  delivery_time             String?             @db.VarChar(255)
+  screenshot                String?             @db.VarChar(255)
+  admin_notes               String?             @db.VarChar(255)
+  created_at                DateTime?           @db.Timestamp(0)
+  updated_at                DateTime?           @db.Timestamp(0)
+  is_pos_order              Int                 @default(0) @db.TinyInt
+  cashier_id                BigInt?             @db.UnsignedBigInt
+  refund_status             order_refund_status @default(none)
+  refund_amount             Decimal             @default(0.00) @db.Decimal(10, 2)
+  billing_address           String?             @db.Text
+  attach_document           String?             @db.VarChar(255)
+  discount_type             String?             @db.VarChar(50)
+  shipping_status           String?             @db.VarChar(50)
+  advance_balance           Decimal             @default(0.00) @db.Decimal(10, 2)
+  paid_on                   DateTime?           @db.Date
+  payment_account           String?             @db.VarChar(255)
+  payment_note              String?             @db.Text
+  change_return             Decimal             @default(0.00) @db.Decimal(10, 2)
+  additional_expense_name   String?             @db.VarChar(255)
+  additional_expense_amount Decimal             @default(0.00) @db.Decimal(10, 2)
+  pay_term                  String?             @db.VarChar(50)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model order_details {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id            BigInt?   @db.UnsignedBigInt
+  order_id           BigInt?   @db.UnsignedBigInt
+  item_id            BigInt?   @db.UnsignedBigInt
+  item_name          String?   @db.VarChar(255)
+  item_image         String?   @db.VarChar(255)
+  item_type          Int?
+  addons_id          String?   @db.VarChar(255)
+  addons_name        String?   @db.VarChar(255)
+  addons_price       String?   @db.VarChar(255)
+  addons_total_price String?   @db.VarChar(255)
+  extras_id          String?   @db.VarChar(255)
+  extras_name        String?   @db.VarChar(255)
+  extras_price       String?   @db.VarChar(255)
+  extras_total_price String?   @db.VarChar(255)
+  item_price         String    @db.VarChar(255)
+  tax                Float?
+  qty                String?   @db.VarChar(255)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+}
+
+model other_settings {
+  id                                     Int       @id @default(autoincrement())
+  tips_settings                          Int?
+  trusted_badge_image_1                  String?   @db.Text
+  trusted_badge_image_2                  String?   @db.Text
+  trusted_badge_image_3                  String?   @db.Text
+  trusted_badge_image_4                  String?   @db.Text
+  safe_secure_checkout_payment_selection String?   @db.VarChar(255)
+  safe_secure_checkout_text              String?   @db.VarChar(255)
+  safe_secure_checkout_text_color        String?   @db.VarChar(255)
+  created_at                             DateTime? @db.Timestamp(0)
+  updated_at                             DateTime? @db.Timestamp(0)
+}
+
+model otp_configuration {
+  id                   Int      @id @default(autoincrement())
+  twilio_sid           String?  @db.Text
+  twilio_auth_token    String?  @db.Text
+  twilio_mobile_number String?  @db.Text
+  msg_authkey          String?  @db.VarChar(255)
+  msg_template_id      String?  @db.VarChar(255)
+  name                 String   @db.VarChar(255)
+  status               Int
+  created_at           DateTime @default(now()) @db.Timestamp(0)
+  updated_at           DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model password_resets {
+  email      String    @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+
+  @@index([email(length: 191)], map: "password_resets_email_index")
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model payment {
+  id                  Int      @id @default(autoincrement())
+  reorder_id          Int
+  unique_identifier   String?  @db.VarChar(255)
+  environment         Int      @default(1)
+  payment_name        String   @db.Text
+  payment_type        Int
+  image               String?  @db.VarChar(255)
+  currency            String?  @db.VarChar(255)
+  public_key          String?  @db.Text
+  secret_key          String?  @db.Text
+  encryption_key      String?  @db.Text
+  base_url_by_region  String?  @db.Text
+  payment_description String?  @db.Text
+  is_available        Int
+  is_activate         Int
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String    @db.VarChar(255)
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String    @db.VarChar(255)
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model pincode {
+  id              BigInt    @id @default(autoincrement())
+  pincode         String    @db.VarChar(10)
+  delivery_charge String    @db.VarChar(255)
+  is_available    Int       @default(1)
+  is_deleted      Int       @default(2)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model pixcel_settings {
+  id                 Int      @id @default(autoincrement())
+  facebook_pixcel_id String?  @db.VarChar(255)
+  twitter_pixcel_id  String?  @db.VarChar(255)
+  linkedin_pixcel_id String?  @db.VarChar(255)
+  google_tag_id      String?  @db.VarChar(255)
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+  updated_at         DateTime @default(now()) @db.Timestamp(0)
+}
+
+model privacypolicy {
+  id                    Int      @id @default(autoincrement())
+  privacypolicy_content String   @db.LongText
+  created_at            DateTime @default(now()) @db.Timestamp(0)
+  updated_at            DateTime @default(now()) @db.Timestamp(0)
+}
+
+model product_card_images {
+  id         Int       @id @default(autoincrement())
+  image      String    @db.Text
+  card_id    Int
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model promocode {
+  id           BigInt    @id @default(autoincrement())
+  reorder_id   Int
+  offer_name   String    @db.VarChar(255)
+  offer_code   String    @db.VarChar(20)
+  offer_type   Int
+  offer_amount String    @db.VarChar(255)
+  min_amount   Int
+  per_user     Int
+  usage_type   Int
+  usage_limit  Int?
+  start_date   String    @db.Text
+  expire_date  String    @db.Text
+  description  String    @db.LongText
+  is_available Int       @default(1)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ratting {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  reorder_id Int
+  user_id    BigInt?   @db.UnsignedBigInt
+  item_id    Int?
+  ratting    String    @db.VarChar(255)
+  comment    String    @db.VarChar(255)
+  name       String?   @db.VarChar(255)
+  image      String?   @db.Text
+  status     Int       @default(1)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([user_id], map: "ratting_user_id_foreign")
+  @@index([user_id], map: "user_id")
+}
+
+model refundpolicy {
+  id                   Int      @id @default(autoincrement())
+  refundpolicy_content String   @db.LongText
+  created_at           DateTime @default(now()) @db.Timestamp(0)
+  updated_at           DateTime @default(now()) @db.Timestamp(0)
+}
+
+model roles {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String
+  label      String
+  guard_name String
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model settings {
+  id                                        Int      @id @default(autoincrement())
+  theme                                     Int
+  product_card_view                         Int?
+  maintenance_mode                          Int      @default(2)
+  online_table_booking                      Int      @default(1)
+  login_required                            String   @db.VarChar(20)
+  is_checkout_login_required                Int
+  android                                   String?  @db.Text
+  ios                                       String?  @db.Text
+  app_bottom_image                          String?  @db.Text
+  mobile_app_image                          String?  @db.VarChar(255)
+  mobile_app_title                          String?  @db.Text
+  mobile_app_description                    String?  @db.Text
+  copyright                                 String?  @db.Text
+  title                                     String?  @db.Text
+  short_title                               String?  @db.Text
+  og_title                                  String?  @db.Text
+  og_description                            String?  @db.LongText
+  notification_tune                         String   @db.Text
+  mobile                                    String?  @db.VarChar(255)
+  show_product_brief                        Int?     @default(1)
+  cart_style                                String?  @default("sidebar") @db.VarChar(20)
+  show_cart_sidebar                         Int?     @default(1)
+  email                                     String?  @db.VarChar(255)
+  address                                   String?  @db.Text
+  address_url                               String?  @db.Text
+  currency                                  String?  @db.VarChar(255)
+  currency_position                         Int?
+  currency_space                            String   @default("1") @db.VarChar(255)
+  currency_formate                          String?  @db.VarChar(255)
+  decimal_separator                         String   @default("1") @db.VarChar(255)
+  time_format                               String?  @db.VarChar(255)
+  date_format                               String?  @db.VarChar(255)
+  max_order_qty                             Int
+  min_order_amount                          Int
+  max_order_amount                          Int
+  order_prefix                              String?  @db.VarChar(255)
+  order_number_start                        String?  @db.VarChar(255)
+  firebase                                  String   @db.Text
+  referral_amount                           Int
+  timezone                                  String?  @db.Text
+  image                                     String?  @db.VarChar(255)
+  logo                                      String?  @db.VarChar(255)
+  favicon                                   String?  @db.VarChar(255)
+  web_primary_color                         String   @db.VarChar(255)
+  web_secondary_color                       String   @db.VarChar(255)
+  admin_primary_color                       String   @db.VarChar(255)
+  admin_secondary_color                     String   @db.VarChar(255)
+  footer_title                              String?  @db.VarChar(255)
+  footer_description                        String?  @db.VarChar(255)
+  footer_logo                               String?  @db.VarChar(255)
+  og_image                                  String?  @db.VarChar(255)
+  pwa                                       String?  @db.VarChar(255)
+  pwa_app_logo                              String?  @db.VarChar(255)
+  pwa_app_name                              String?  @db.VarChar(255)
+  pwa_app_title                             String?  @db.VarChar(255)
+  pwa_background_color                      String?  @db.VarChar(255)
+  pwa_theme_color                           String?  @db.VarChar(255)
+  google_mode                               Int?
+  google_client_id                          String   @db.VarChar(255)
+  google_client_secret                      String   @db.VarChar(255)
+  google_redirect_url                       String   @default("http://your-domain-url.com/checklogin/google/callback-google") @db.VarChar(255)
+  facebook_mode                             Int?
+  facebook_client_id                        String   @db.VarChar(255)
+  facebook_client_secret                    String   @db.VarChar(255)
+  facebook_redirect_url                     String   @default("http://your-domain-url.com/checklogin/facebook/callback-facebook\t") @db.VarChar(255)
+  mail_driver                               String?  @db.VarChar(255)
+  mail_host                                 String?  @db.VarChar(255)
+  mail_port                                 String?  @db.VarChar(255)
+  mail_username                             String?  @db.VarChar(255)
+  mail_password                             String?  @db.VarChar(255)
+  mail_encryption                           String?  @db.VarChar(255)
+  mail_fromaddress                          String?  @db.VarChar(255)
+  mail_fromname                             String?  @db.VarChar(255)
+  recaptcha_on_off                          Int?
+  recaptcha_version                         String?  @db.VarChar(255)
+  google_recaptcha_site_key                 String?  @default("-") @db.VarChar(255)
+  google_recaptcha_secret_key               String?  @db.VarChar(255)
+  score_threshold                           String?  @db.VarChar(255)
+  pickup_delivery                           Int?
+  review_auto_approved                      String?  @db.Text
+  review_approved_status                    Int      @default(2)
+  verification                              String?  @db.VarChar(50)
+  tawk_widget_id                            String   @db.Text
+  tawk_on_off                               Int
+  interval_type                             Int?
+  interval_time                             Int      @default(1)
+  perslot_booking_limit                     Int?
+  ordertype_date_time                       Int?     @default(2)
+  quick_call                                Int
+  quick_call_mobile_view_on_off             Int
+  quick_call_name                           String?  @db.VarChar(255)
+  quick_call_description                    String?  @db.Text
+  quick_call_mobile                         String?  @db.VarChar(255)
+  quick_call_position                       Int
+  quick_call_image                          String?  @db.VarChar(255)
+  wizz_chat_settings                        String?  @db.LongText
+  wizz_chat_on_off                          String?  @db.Text
+  fake_sales_notification                   Int
+  product_source                            Int
+  next_time_popup                           Int
+  notification_display_time                 Int
+  sales_notification_position               Int
+  product_fake_view                         Int
+  fake_view_message                         String?  @db.Text
+  min_view_count                            Int
+  max_view_count                            Int
+  why_choose_title                          String?  @db.VarChar(255)
+  why_choose_subtitle                       String?  @db.VarChar(255)
+  why_choose_description                    String?  @db.Text
+  why_choose_image                          String?  @db.VarChar(255)
+  google_review_url                         String?  @db.VarChar(255)
+  cart_checkout_countdown                   Int
+  countdown_message                         String?  @db.Text
+  countdown_expired_message                 String?  @db.Text
+  countdown_mins                            Int
+  shipping_area                             Int?
+  min_order_amount_for_free_shipping        String?  @db.Text
+  shipping_charges                          String?  @db.Text
+  cart_checkout_progressbar                 Int
+  progress_message                          String?  @db.Text
+  progress_message_end                      String?  @db.Text
+  auth_bg_image                             String?  @db.Text
+  faqs_image                                String?  @db.Text
+  booknow_bg_image                          String?  @db.Text
+  refer_earn_bg_image                       String?  @db.Text
+  subscribe_newsletter_image                String?  @db.Text
+  no_data_image                             String?  @db.Text
+  default_language                          String?  @db.VarChar(255)
+  forget_password_email_message             String?  @db.LongText
+  delete_account_email_message              String?  @db.LongText
+  new_order_invoice_email_message           String?  @db.LongText
+  order_status_email_message                String?  @db.LongText
+  referral_earning_email_message            String?  @db.LongText
+  user_verification_email_message           String?  @db.LongText
+  online_table_booking_email_message        String?  @db.LongText
+  online_table_booking_accept_email_message String?  @db.LongText
+  online_table_booking_reject_email_message String?  @db.LongText
+  created_at                                DateTime @default(now()) @db.Timestamp(0)
+  updated_at                                DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model shipping_area {
+  id              Int      @id @default(autoincrement())
+  reorder_id      Int?
+  area_name       String   @db.VarChar(255)
+  delivery_charge Float
+  is_available    Int      @default(1)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model slider {
+  id           Int      @id @default(autoincrement())
+  reorder_id   Int
+  title        String   @db.VarChar(50)
+  type         Int?
+  cat_id       Int?
+  item_id      Int?
+  description  String?  @db.Text
+  image        String   @db.VarChar(50)
+  is_available Int      @default(1)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model social_links {
+  id         Int       @id @default(autoincrement())
+  icon       String    @db.VarChar(255)
+  link       String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model subcategories {
+  id               Int       @id @default(autoincrement()) @db.UnsignedInt
+  reorder_id       Int
+  cat_id           Int
+  subcategory_name String    @db.VarChar(255)
+  slug             String    @db.Text
+  is_available     Boolean   @default(true)
+  is_deleted       Int       @default(2) @db.TinyInt
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+}
+
+model subscribe {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  email      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model systemaddons {
+  id                Int      @id @default(autoincrement())
+  name              String   @db.VarChar(255)
+  unique_identifier String   @db.VarChar(255)
+  version           String   @db.VarChar(20)
+  activated         Int
+  image             String   @db.VarChar(255)
+  type              Int
+  created_at        DateTime @default(now()) @db.Timestamp(0)
+  updated_at        DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tax {
+  id           Int      @id @default(autoincrement())
+  reorder_id   Int
+  name         String   @db.VarChar(255)
+  type         Int
+  tax          String   @db.VarChar(255)
+  is_available Int      @default(1)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model teams {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  reorder_id  Int
+  image       String    @db.VarChar(255)
+  name        String    @db.VarChar(255)
+  designation String    @db.VarChar(255)
+  fb          String?   @db.Text
+  youtube     String?   @db.Text
+  insta       String?   @db.Text
+  twitter     String?   @db.Text
+  description String    @db.LongText
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model telegram_message {
+  id                    Int       @id @default(autoincrement())
+  item_message          String    @db.LongText
+  telegram_message      String    @db.LongText
+  order_created         Int
+  telegram_access_token String    @db.Text
+  telegram_chat_id      String    @db.Text
+  created_at            DateTime? @db.Timestamp(0)
+  updated_at            DateTime? @db.Timestamp(0)
+}
+
+model terms {
+  id                     Int      @id @default(autoincrement())
+  termscondition_content String   @db.LongText
+  created_at             DateTime @default(now()) @db.Timestamp(0)
+  updated_at             DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model time {
+  id           Int       @id @default(autoincrement())
+  day          String    @db.VarChar(50)
+  open_time    String    @db.VarChar(20)
+  break_start  String    @db.VarChar(255)
+  break_end    String    @db.VarChar(255)
+  close_time   String    @db.VarChar(20)
+  always_close Int       @default(2)
+  created_at   DateTime  @default(now()) @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model top_deals {
+  id               Int       @id @default(autoincrement())
+  start_date       DateTime? @db.Date
+  start_time       DateTime? @db.Time(0)
+  end_date         DateTime? @db.Date
+  end_time         DateTime? @db.Time(0)
+  offer_type       Int
+  deal_type        Int
+  top_deals_switch Int       @default(2)
+  offer_amount     String    @db.VarChar(255)
+  created_at       DateTime  @default(now()) @db.Timestamp(0)
+  updated_at       DateTime  @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model transaction {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  order_id         Int?
+  order_number     String?  @db.VarChar(50)
+  amount           String   @db.VarChar(20)
+  tips             String?  @db.VarChar(255)
+  transaction_id   String?  @db.Text
+  transaction_type String   @db.VarChar(255)
+  username         String?  @db.VarChar(255)
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+  updated_at       DateTime @default(now()) @db.Timestamp(0)
+}
+
+model tutorials {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  image       String    @db.VarChar(255)
+  title       String    @db.VarChar(255)
+  description String    @db.LongText
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id              BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  branch_id       BigInt?     @db.UnsignedBigInt
+  name            String      @db.VarChar(255)
+  email           String      @db.VarChar(255)
+  mobile          String?     @db.VarChar(255)
+  profile_image   String      @db.VarChar(100)
+  password        String      @db.VarChar(255)
+  login_type      String      @db.VarChar(10)
+  google_id       String?     @db.Text
+  facebook_id     String?     @db.Text
+  role_id         Int?
+  type            Int
+  loyalty_points  Int         @default(0)
+  loyalty_tier    String      @default("Bronze") @db.VarChar(50)
+  identity_image  String?     @db.Text
+  identity_type   String?     @db.Text
+  identity_number String?     @db.Text
+  token           String      @db.LongText
+  wallet          String?     @default("00") @db.VarChar(50)
+  referral_code   String?     @db.VarChar(10)
+  user_id         Int?
+  referral_amount Int         @default(0)
+  is_available    Int         @default(1)
+  is_online       Int         @default(2)
+  is_notification Int?        @default(1)
+  is_mail         Int?        @default(1)
+  otp             String?     @db.VarChar(6)
+  is_verified     Int?
+  is_deleted      Int         @default(2)
+  remember_token  String?     @db.Text
+  license_type    String?     @db.VarChar(255)
+  created_at      DateTime?   @db.Timestamp(0)
+  updated_at      DateTime?   @db.Timestamp(0)
+  fa_enabled      Int         @default(0) @map("2fa_enabled") @db.TinyInt
+  fa_secret       String?     @map("2fa_secret") @db.VarChar(255)
+  purchases       purchases[]
+}
+
+model variation {
+  id                  Int      @id @default(autoincrement())
+  item_id             Int
+  price               String?  @default("0") @db.VarChar(255)
+  original_price      String?  @default("0") @db.VarChar(255)
+  name                String?  @db.VarChar(255)
+  discount_percentage Float    @db.Float
+  qty                 Int?
+  min_order           Int?     @default(0)
+  max_order           Int?     @default(0)
+  low_qty             String?  @default("0") @db.VarChar(255)
+  stock_management    Int?
+  is_available        Int
+  created_at          DateTime @default(now()) @db.DateTime(0)
+  updated_at          DateTime @default(now()) @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model whatsapp_message {
+  id                          Int      @id @default(autoincrement())
+  item_message                String   @db.LongText
+  whatsapp_message            String   @db.LongText
+  status_message              String   @db.LongText
+  whatsapp_number             String   @db.VarChar(255)
+  whatsapp_phone_number_id    String   @db.VarChar(255)
+  whatsapp_access_token       String   @db.LongText
+  whatsapp_chat_on_off        Int
+  whatsapp_mobile_view_on_off Int
+  whatsapp_chat_position      Int      @default(1)
+  order_created               Int
+  status_change               Int
+  message_type                Int
+  created_at                  DateTime @default(now()) @db.Timestamp(0)
+  updated_at                  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model whychooseus {
+  id         Int      @id @default(autoincrement())
+  reorder_id Int?
+  title      String   @db.VarChar(255)
+  subtitle   String?  @db.VarChar(255)
+  image      String   @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model activity_logs {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id     BigInt?   @db.UnsignedBigInt
+  action      String    @db.VarChar(255)
+  module      String    @db.VarChar(255)
+  description String?   @db.Text
+  ip_address  String?   @db.VarChar(255)
+  user_agent  String?   @db.VarChar(255)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model branches {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String      @db.VarChar(255)
+  address    String?     @db.Text
+  phone      String?     @db.VarChar(255)
+  email      String?     @db.VarChar(255)
+  manager_id BigInt?     @db.UnsignedBigInt
+  status     Int         @default(1) @db.TinyInt
+  created_at DateTime?   @db.Timestamp(0)
+  updated_at DateTime?   @db.Timestamp(0)
+  purchases  purchases[]
+}
+
+model deliveries {
+  id               BigInt                     @id @default(autoincrement()) @db.UnsignedBigInt
+  order_id         BigInt                     @db.UnsignedBigInt
+  driver_id        BigInt?                    @db.UnsignedBigInt
+  delivery_status  deliveries_delivery_status @default(pending)
+  delivery_address String?                    @db.Text
+  delivery_notes   String?                    @db.Text
+  delivery_fee     Decimal                    @default(0.00) @db.Decimal(10, 2)
+  assigned_at      DateTime?                  @db.Timestamp(0)
+  picked_up_at     DateTime?                  @db.Timestamp(0)
+  delivered_at     DateTime?                  @db.Timestamp(0)
+  created_at       DateTime?                  @db.Timestamp(0)
+  updated_at       DateTime?                  @db.Timestamp(0)
+}
+
+model expenses {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title         String    @db.VarChar(255)
+  amount        Decimal   @db.Decimal(10, 2)
+  category      String?   @db.VarChar(255)
+  description   String?   @db.Text
+  branch_id     BigInt?   @db.UnsignedBigInt
+  receipt_image String?   @db.VarChar(255)
+  created_by    BigInt    @db.UnsignedBigInt
+  expense_date  DateTime  @db.Date
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+}
+
+model password_reset_tokens {
+  email      String    @id @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+}
+
+model pos_held_carts {
+  id              BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  reference_no    String                @unique(map: "pos_held_carts_reference_no_unique") @db.VarChar(255)
+  cashier_id      BigInt                @db.UnsignedBigInt
+  customer_id     BigInt?               @db.UnsignedBigInt
+  items           Json
+  subtotal        Decimal               @default(0.00) @db.Decimal(10, 2)
+  tax_amount      Decimal               @default(0.00) @db.Decimal(10, 2)
+  discount_amount Decimal               @default(0.00) @db.Decimal(10, 2)
+  total           Decimal               @default(0.00) @db.Decimal(10, 2)
+  notes           String?               @db.Text
+  status          pos_held_carts_status @default(held)
+  created_at      DateTime?             @db.Timestamp(0)
+  updated_at      DateTime?             @db.Timestamp(0)
+}
+
+model purchase_items {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  purchase_id BigInt    @db.UnsignedBigInt
+  product_id  BigInt    @db.UnsignedBigInt
+  quantity    Decimal   @db.Decimal(10, 2)
+  cost_price  Decimal   @db.Decimal(10, 2)
+  total       Decimal   @db.Decimal(10, 2)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+  purchases   purchases @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "purchase_items_purchase_id_foreign")
+
+  @@index([purchase_id], map: "purchase_items_purchase_id_foreign")
+}
+
+model purchases {
+  id              BigInt                   @id @default(autoincrement()) @db.UnsignedBigInt
+  supplier_id     BigInt                   @db.UnsignedBigInt
+  branch_id       BigInt?                  @db.UnsignedBigInt
+  reference_no    String?                  @db.VarChar(255)
+  total_amount    Decimal                  @default(0.00) @db.Decimal(10, 2)
+  discount_amount Decimal                  @default(0.00) @db.Decimal(10, 2)
+  tax_amount      Decimal                  @default(0.00) @db.Decimal(10, 2)
+  grand_total     Decimal                  @default(0.00) @db.Decimal(10, 2)
+  payment_status  purchases_payment_status @default(unpaid)
+  payment_method  String?                  @db.VarChar(255)
+  notes           String?                  @db.Text
+  purchase_status String?                  @default("received") @db.VarChar(50)
+  purchase_date   DateTime?                @db.Date
+  pay_term        String?                  @db.VarChar(50)
+  attach_document String?                  @db.VarChar(255)
+  created_by      BigInt                   @db.UnsignedBigInt
+  created_at      DateTime?                @db.Timestamp(0)
+  updated_at      DateTime?                @db.Timestamp(0)
+  purchase_items  purchase_items[]
+  branches        branches?                @relation(fields: [branch_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "purchases_branch_id_foreign")
+  users           users                    @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "purchases_created_by_foreign")
+  suppliers       suppliers                @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "purchases_supplier_id_foreign")
+
+  @@index([branch_id], map: "purchases_branch_id_foreign")
+  @@index([created_by], map: "purchases_created_by_foreign")
+  @@index([supplier_id], map: "purchases_supplier_id_foreign")
+}
+
+model sales_agents {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id         BigInt    @db.UnsignedBigInt
+  target_amount   Decimal   @default(0.00) @db.Decimal(10, 2)
+  commission_rate Decimal   @default(0.00) @db.Decimal(5, 2)
+  branch_id       BigInt?   @db.UnsignedBigInt
+  status          Int       @default(1) @db.TinyInt
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model suppliers {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String      @db.VarChar(255)
+  phone      String?     @db.VarChar(255)
+  email      String?     @db.VarChar(255)
+  address    String?     @db.Text
+  company    String?     @db.VarChar(255)
+  notes      String?     @db.Text
+  status     Int         @default(1) @db.TinyInt
+  created_at DateTime?   @db.Timestamp(0)
+  updated_at DateTime?   @db.Timestamp(0)
+  purchases  purchases[]
+}
+
+enum deliveries_delivery_status {
+  pending
+  assigned
+  picked_up
+  on_the_way
+  delivered
+  failed
+}
+
+enum purchases_payment_status {
+  paid
+  partial
+  unpaid
+}
+
+enum pos_held_carts_status {
+  held
+  completed
+  cancelled
+}
+
+enum order_refund_status {
+  none
+  partial
+  full
+}
+
+model till_sessions {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  opening_balance Decimal   @db.Decimal(10, 2)
+  closing_balance Decimal?  @db.Decimal(10, 2)
+  cash_sales      Decimal?  @db.Decimal(10, 2)
+  card_sales      Decimal?  @db.Decimal(10, 2)
+  status          String    @default("open")
+  opened_at       DateTime  @default(now())
+  closed_at       DateTime?
+}
+
+model permissions {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(255)
+  guard_name String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model role_has_permissions {
+  permission_id BigInt @db.UnsignedBigInt
+  role_id       BigInt @db.UnsignedBigInt
+
+  @@id([permission_id, role_id])
+}
+
+model brands {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String    @db.VarChar(255)
+  description String?   @db.Text
+  status      Int       @default(1)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model units {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  name          String    @db.VarChar(255)
+  short_name    String    @db.VarChar(50)
+  allow_decimal Int       @default(0)
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+}
+
+model warranties {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  name          String    @db.VarChar(255)
+  description   String?   @db.Text
+  updated_at    DateTime? @db.Timestamp(0)
+}
+
+model ai_chat_memory {
+  id         Int      @id @default(autoincrement())
+  session_id String   @db.VarChar(255)
+  role       String   @db.VarChar(50)
+  content    String   @db.LongText
+  created_at DateTime @default(now())
+}
+
+model ai_agent_logs {
+  id           Int      @id @default(autoincrement())
+  workflow_id  String   @db.VarChar(255)
+  node_name    String   @db.VarChar(255)
+  action       String   @db.VarChar(255)
+  payload      String   @db.LongText
+  status       String   @db.VarChar(50)
+  created_at   DateTime @default(now())
+}
+
+model flowcraft_workflows {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  name       String   @db.VarChar(255)
+  json_data  Json?
+  active     Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model flowcraft_executions {
+  id            String    @id @default(uuid()) @db.VarChar(36)
+  workflow_id   String    @db.VarChar(36)
+  status        String    @db.VarChar(50)
+  started_at    DateTime  @default(now()) @db.Timestamp(0)
+  finished_at   DateTime? @db.Timestamp(0)
+  data          Json?
+  error_message String?   @db.Text
+}
+
+model flowcraft_credentials {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  name           String   @db.VarChar(255)
+  data_encrypted String   @db.Text
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+model site_settings {
+  id            Int      @id @default(autoincrement())
+  key_name      String   @unique @db.VarChar(255)
+  value         String   @db.LongText
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+}
+
+// ==========================================
+// BUSINESS MANAGEMENT PLATFORM EXTENSIONS
+// ==========================================
+
+// 1. Supplier Management & Sourcing Models
+model supplier {
+  id                  Int      @id @default(autoincrement())
+  company_name        String   @db.VarChar(255)
+  contact_person      String?  @db.VarChar(255)
+  email               String?  @db.VarChar(255)
+  phone               String?  @db.VarChar(50)
+  country             String?  @db.VarChar(100)
+  address             String?  @db.Text
+  reliability_score   Float?   @default(0) @db.Float
+  performance_rating  Float?   @default(0) @db.Float
+  is_verified         Int      @default(0)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model rfq {
+  id                  Int      @id @default(autoincrement())
+  rfq_number          String   @unique @db.VarChar(100)
+  product_name        String   @db.VarChar(255)
+  description         String?  @db.Text
+  target_price        Decimal? @db.Decimal(10, 2)
+  target_quantity     Int
+  status              String   @default("Pending") @db.VarChar(50) // Pending, Sent, Quoted, Closed
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model supplier_quotation {
+  id                  Int      @id @default(autoincrement())
+  rfq_id              Int
+  supplier_id         Int
+  quoted_price        Decimal  @db.Decimal(10, 2)
+  moq                 Int
+  lead_time_days      Int
+  valid_until         DateTime? @db.Date
+  status              String   @default("Pending") @db.VarChar(50) // Pending, Accepted, Rejected
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model sourcing_recommendation {
+  id                  Int      @id @default(autoincrement())
+  keyword             String   @db.VarChar(255)
+  demand_score        Float    @db.Float
+  competition_score   Float    @db.Float
+  estimated_margin    Float    @db.Float
+  ai_analysis_summary String?  @db.Text
+  recommended_action  String?  @db.VarChar(255)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+// 2. Logistics & Forwarding Models
+model freight_forwarder {
+  id                  Int      @id @default(autoincrement())
+  name                String   @db.VarChar(255)
+  contact_email       String?  @db.VarChar(255)
+  contact_phone       String?  @db.VarChar(50)
+  rating              Float?   @default(0) @db.Float
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model shipment {
+  id                  Int      @id @default(autoincrement())
+  tracking_number     String   @unique @db.VarChar(100)
+  forwarder_id        Int?
+  origin              String?  @db.VarChar(255)
+  destination         String?  @db.VarChar(255)
+  status              String   @default("Pending") @db.VarChar(50)
+  cost                Decimal? @db.Decimal(10, 2)
+  estimated_arrival   DateTime? @db.Date
+  actual_arrival      DateTime? @db.Date
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model shipment_tracking {
+  id                  Int      @id @default(autoincrement())
+  shipment_id         Int
+  status_update       String   @db.VarChar(255)
+  location            String?  @db.VarChar(255)
+  timestamp           DateTime @default(now()) @db.Timestamp(0)
+}
+
+// 3. Marketplace Management Models
+model marketplace_config {
+  id                  Int      @id @default(autoincrement())
+  platform            String   @db.VarChar(100) // Amazon, Etsy, Shopify, etc.
+  api_key             String?  @db.Text
+  api_secret          String?  @db.Text
+  store_url           String?  @db.VarChar(255)
+  is_active           Int      @default(0)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model marketplace_listing {
+  id                  Int      @id @default(autoincrement())
+  product_id          BigInt   // Links to existing 'item' table
+  marketplace_id      Int      // Links to marketplace_config
+  external_product_id String?  @db.VarChar(255)
+  published_price     Decimal  @db.Decimal(10, 2)
+  sync_status         String   @default("Pending") @db.VarChar(50)
+  last_synced_at      DateTime? @db.Timestamp(0)
+}
+
+// 4. Digital Marketing Models
+model social_account {
+  id                  Int      @id @default(autoincrement())
+  platform            String   @db.VarChar(100) // Facebook, TikTok, Instagram
+  account_name        String   @db.VarChar(255)
+  access_token        String?  @db.Text
+  refresh_token       String?  @db.Text
+  is_active           Int      @default(0)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model marketing_campaign {
+  id                  Int      @id @default(autoincrement())
+  name                String   @db.VarChar(255)
+  objective           String?  @db.VarChar(100)
+  budget              Decimal? @db.Decimal(10, 2)
+  status              String   @default("Draft") @db.VarChar(50)
+  start_date          DateTime? @db.Date
+  end_date            DateTime? @db.Date
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}
+
+model marketing_content {
+  id                  Int      @id @default(autoincrement())
+  campaign_id         Int?
+  social_account_id   Int?
+  content_type        String   @db.VarChar(50) // Post, Ad, Story
+  ai_generated_copy   String?  @db.Text
+  media_url           String?  @db.VarChar(255)
+  scheduled_at        DateTime? @db.Timestamp(0)
+  status              String   @default("Draft") @db.VarChar(50)
+  engagement_clicks   Int      @default(0)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+}

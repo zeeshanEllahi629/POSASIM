@@ -1,0 +1,277 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .pos-wrapper { display: grid; grid-template-columns: 1fr 340px; height: 600px; background: var(--color-background-tertiary); gap: 0; border-radius: var(--border-radius-lg); overflow: hidden; border: 0.5px solid var(--color-border-tertiary); }
+  .left-panel { display: flex; flex-direction: column; background: var(--color-background-primary); }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .store-badge { background: #185FA5; color: #E6F1FB; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; }
+  .sync-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-text-secondary); }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #639922; }
+  .search-bar { display: flex; align-items: center; gap: 8px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; padding: 6px 10px; flex: 1; max-width: 280px; }
+  .search-bar input { background: none; border: none; outline: none; font-size: 13px; color: var(--color-text-primary); width: 100%; }
+  .cats { display: flex; gap: 8px; padding: 10px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); overflow-x: auto; }
+  .cat-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .cat-btn.active { background: #185FA5; color: #E6F1FB; border-color: #185FA5; }
+  .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 14px 16px; overflow-y: auto; flex: 1; }
+  .prod-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px; cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; gap: 6px; }
+  .prod-card:hover { border-color: #185FA5; background: #E6F1FB; }
+  .prod-card.added { border-color: #639922; background: #EAF3DE; }
+  .prod-img { width: 100%; aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 26px; background: var(--color-background-secondary); }
+  .prod-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); line-height: 1.3; }
+  .prod-price { font-size: 13px; font-weight: 500; color: #185FA5; }
+  .prod-stock { font-size: 10px; color: var(--color-text-secondary); }
+  .right-panel { display: flex; flex-direction: column; background: var(--color-background-secondary); border-left: 0.5px solid var(--color-border-tertiary); }
+  .cart-header { padding: 12px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; }
+  .cart-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); display: flex; align-items: center; gap: 6px; }
+  .cart-count { background: #185FA5; color: #E6F1FB; font-size: 11px; padding: 2px 7px; border-radius: 10px; }
+  .clear-btn { font-size: 12px; color: #A32D2D; cursor: pointer; border: none; background: none; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .cart-item { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .ci-icon { font-size: 20px; min-width: 28px; text-align: center; }
+  .ci-info { flex: 1; min-width: 0; }
+  .ci-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ci-price { font-size: 11px; color: var(--color-text-secondary); }
+  .ci-qty { display: flex; align-items: center; gap: 6px; }
+  .qty-btn { width: 22px; height: 22px; border-radius: 5px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--color-text-primary); }
+  .qty-num { font-size: 13px; font-weight: 500; min-width: 16px; text-align: center; color: var(--color-text-primary); }
+  .ci-total { font-size: 13px; font-weight: 500; color: #185FA5; min-width: 50px; text-align: right; }
+  .cart-summary { padding: 12px 16px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; gap: 6px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--color-text-secondary); }
+  .summary-row.total { font-size: 16px; font-weight: 500; color: var(--color-text-primary); border-top: 0.5px solid var(--color-border-tertiary); padding-top: 8px; margin-top: 2px; }
+  .discount-row { display: flex; align-items: center; gap: 6px; }
+  .discount-input { border: 0.5px solid var(--color-border-secondary); border-radius: 6px; padding: 3px 8px; font-size: 12px; width: 70px; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+  .pay-methods { display: flex; gap: 6px; padding: 0 16px 10px; }
+  .pay-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); font-size: 12px; color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s; }
+  .pay-btn.active { background: #E6F1FB; border-color: #185FA5; color: #185FA5; }
+  .checkout-btn { margin: 0 16px 14px; padding: 13px; border-radius: 10px; background: #185FA5; color: #E6F1FB; border: none; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; }
+  .checkout-btn:hover { background: #0C447C; }
+  .empty-cart { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--color-text-secondary); gap: 8px; font-size: 13px; }
+  .customer-row { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .cust-select { flex: 1; border: 0.5px solid var(--color-border-secondary); border-radius: 7px; padding: 5px 8px; font-size: 12px; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+</style>
+
+<h2 class="sr-only">Desktop POS System — product selection and cart on the right</h2>
+
+<div class="pos-wrapper">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="store-badge"><i class="ti ti-building-store" aria-hidden="true"></i> MyStore POS</span>
+        <span class="sync-badge"><span class="sync-dot"></span>Website se connected</span>
+      </div>
+      <div class="search-bar">
+        <i class="ti ti-search" style="font-size:16px;color:var(--color-text-secondary);" aria-hidden="true"></i>
+        <input type="text" placeholder="Product search karein..." id="searchInput" oninput="filterProducts()" />
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--color-text-secondary);">
+        <span><i class="ti ti-user" aria-hidden="true"></i> Ali Hassan</span>
+        <span><i class="ti ti-clock" aria-hidden="true"></i> <span id="clockEl"></span></span>
+      </div>
+    </div>
+
+    <div class="cats">
+      <button class="cat-btn active" onclick="filterCat(this,'all')">Sab</button>
+      <button class="cat-btn" onclick="filterCat(this,'food')">Khaana</button>
+      <button class="cat-btn" onclick="filterCat(this,'drink')">Peena</button>
+      <button class="cat-btn" onclick="filterCat(this,'elec')">Electronics</button>
+      <button class="cat-btn" onclick="filterCat(this,'cloth')">Kapray</button>
+      <button class="cat-btn" onclick="filterCat(this,'care')">Skin Care</button>
+    </div>
+
+    <div class="products-grid" id="productsGrid"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="cart-header">
+      <span class="cart-title"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Cart <span class="cart-count" id="cartCount">0</span></span>
+      <button class="clear-btn" onclick="clearCart()"><i class="ti ti-trash" aria-hidden="true"></i> Saaf karein</button>
+    </div>
+
+    <div class="customer-row">
+      <i class="ti ti-user-circle" style="font-size:18px;color:var(--color-text-secondary);" aria-hidden="true"></i>
+      <select class="cust-select">
+        <option>Walk-in Customer</option>
+        <option>Ahmed Ali — 0300-1234567</option>
+        <option>Sara Khan — 0312-9876543</option>
+        <option>Usman Malik — 0333-4567890</option>
+      </select>
+      <button style="border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:5px 8px;background:var(--color-background-primary);cursor:pointer;font-size:12px;color:var(--color-text-secondary);"><i class="ti ti-plus" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="cart-items" id="cartItems">
+      <div class="empty-cart" id="emptyCart">
+        <i class="ti ti-shopping-cart-off" style="font-size:36px;opacity:0.3;" aria-hidden="true"></i>
+        <span>Cart khali hai</span>
+        <span style="font-size:11px;">Product select karein</span>
+      </div>
+    </div>
+
+    <div class="cart-summary" id="cartSummary" style="display:none;">
+      <div class="summary-row"><span>Subtotal</span><span id="subtotal">Rs. 0</span></div>
+      <div class="summary-row">
+        <span>Discount</span>
+        <div class="discount-row">
+          <input class="discount-input" type="number" id="discountVal" value="0" min="0" oninput="updateTotals()" placeholder="0" />
+          <span style="font-size:11px;">Rs.</span>
+        </div>
+      </div>
+      <div class="summary-row"><span>Tax (17% GST)</span><span id="taxAmt">Rs. 0</span></div>
+      <div class="summary-row total"><span>Total</span><span id="grandTotal">Rs. 0</span></div>
+    </div>
+
+    <div class="pay-methods">
+      <button class="pay-btn active" onclick="selectPay(this)"><i class="ti ti-cash" aria-hidden="true"></i> Naqdh</button>
+      <button class="pay-btn" onclick="selectPay(this)"><i class="ti ti-credit-card" aria-hidden="true"></i> Card</button>
+      <button class="pay-btn" onclick="selectPay(this)"><i class="ti ti-device-mobile" aria-hidden="true"></i> JazzCash</button>
+    </div>
+
+    <button class="checkout-btn" id="checkoutBtn" onclick="doCheckout()">
+      <i class="ti ti-check" aria-hidden="true"></i> Checkout karein — Rs. <span id="checkoutAmt">0</span>
+    </button>
+  </div>
+</div>
+
+<script>
+const products = [
+  {id:1, name:'Biryani Box', price:350, cat:'food', icon:'🍛', stock:24},
+  {id:2, name:'Chicken Burger', price:280, cat:'food', icon:'🍔', stock:15},
+  {id:3, name:'Samosa (6 pcs)', price:120, cat:'food', icon:'🥟', stock:50},
+  {id:4, name:'Pizza Slice', price:220, cat:'food', icon:'🍕', stock:18},
+  {id:5, name:'Pepsi 1.5L', price:100, cat:'drink', icon:'🥤', stock:40},
+  {id:6, name:'Mineral Water', price:60, cat:'drink', icon:'💧', stock:100},
+  {id:7, name:'Mango Juice', price:150, cat:'drink', icon:'🧃', stock:30},
+  {id:8, name:'Earphones', price:1200, cat:'elec', icon:'🎧', stock:8},
+  {id:9, name:'USB Cable', price:400, cat:'elec', icon:'🔌', stock:20},
+  {id:10, name:'Power Bank', price:2500, cat:'elec', icon:'🔋', stock:5},
+  {id:11, name:'Kurta Shalwar', price:1800, cat:'cloth', icon:'👕', stock:12},
+  {id:12, name:'Topi', price:300, cat:'cloth', icon:'🧢', stock:25},
+  {id:13, name:'Face Wash', price:450, cat:'care', icon:'🧴', stock:16},
+  {id:14, name:'Sunscreen SPF50', price:800, cat:'care', icon:'☀️', stock:9},
+  {id:15, name:'Chai Cup', price:40, cat:'drink', icon:'☕', stock:200},
+  {id:16, name:'Nimco Pack', price:80, cat:'food', icon:'🥜', stock:60},
+];
+
+let cart = {};
+let activeCat = 'all';
+let searchTerm = '';
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  const filtered = products.filter(p => {
+    const catOk = activeCat === 'all' || p.cat === activeCat;
+    const searchOk = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return catOk && searchOk;
+  });
+  grid.innerHTML = filtered.map(p => `
+    <div class="prod-card ${cart[p.id] ? 'added' : ''}" onclick="addToCart(${p.id})">
+      <div class="prod-img">${p.icon}</div>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-price">Rs. ${p.price.toLocaleString()}</div>
+      <div class="prod-stock"><i class="ti ti-package" aria-hidden="true"></i> ${p.stock} baaki</div>
+    </div>
+  `).join('');
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = cat;
+  renderProducts();
+}
+
+function filterProducts() {
+  searchTerm = document.getElementById('searchInput').value;
+  renderProducts();
+}
+
+function addToCart(id) {
+  if (cart[id]) cart[id].qty += 1;
+  else { const p = products.find(x => x.id === id); cart[id] = { ...p, qty: 1 }; }
+  updateCart();
+  renderProducts();
+}
+
+function changeQty(id, delta) {
+  if (!cart[id]) return;
+  cart[id].qty += delta;
+  if (cart[id].qty <= 0) delete cart[id];
+  updateCart();
+  renderProducts();
+}
+
+function clearCart() {
+  cart = {};
+  updateCart();
+  renderProducts();
+}
+
+function updateCart() {
+  const items = Object.values(cart);
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cartCount').textContent = count;
+  const emptyDiv = document.getElementById('emptyCart');
+  const summary = document.getElementById('cartSummary');
+
+  if (items.length === 0) {
+    document.getElementById('cartItems').innerHTML = '<div class="empty-cart" id="emptyCart"><i class="ti ti-shopping-cart-off" style="font-size:36px;opacity:0.3;" aria-hidden="true"></i><span>Cart khali hai</span><span style="font-size:11px;">Product select karein</span></div>';
+    summary.style.display = 'none';
+  } else {
+    document.getElementById('cartItems').innerHTML = items.map(i => `
+      <div class="cart-item">
+        <div class="ci-icon">${i.icon}</div>
+        <div class="ci-info">
+          <div class="ci-name">${i.name}</div>
+          <div class="ci-price">Rs. ${i.price.toLocaleString()} / ek</div>
+        </div>
+        <div class="ci-qty">
+          <button class="qty-btn" onclick="changeQty(${i.id},-1)">−</button>
+          <span class="qty-num">${i.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${i.id},1)">+</button>
+        </div>
+        <div class="ci-total">Rs. ${(i.price * i.qty).toLocaleString()}</div>
+      </div>
+    `).join('');
+    summary.style.display = 'flex';
+  }
+  updateTotals();
+}
+
+function updateTotals() {
+  const items = Object.values(cart);
+  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const discount = parseInt(document.getElementById('discountVal')?.value || 0) || 0;
+  const taxable = Math.max(0, subtotal - discount);
+  const tax = Math.round(taxable * 0.17);
+  const total = taxable + tax;
+  if (document.getElementById('subtotal')) {
+    document.getElementById('subtotal').textContent = 'Rs. ' + subtotal.toLocaleString();
+    document.getElementById('taxAmt').textContent = 'Rs. ' + tax.toLocaleString();
+    document.getElementById('grandTotal').textContent = 'Rs. ' + total.toLocaleString();
+    document.getElementById('checkoutAmt').textContent = total.toLocaleString();
+  }
+}
+
+function selectPay(btn) {
+  document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function doCheckout() {
+  const items = Object.values(cart);
+  if (items.length === 0) { alert('Cart khali hai!'); return; }
+  const total = document.getElementById('grandTotal').textContent;
+  sendPrompt('POS sale complete ho gayi! Items: ' + items.map(i => i.name + ' x' + i.qty).join(', ') + ' — ' + total + '. Kya mujhe receipt generate karni chahiye aur website inventory update karni chahiye?');
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clockEl').textContent = now.toLocaleTimeString('ur-PK', {hour:'2-digit', minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+renderProducts();
+</script>
