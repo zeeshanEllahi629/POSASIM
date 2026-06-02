@@ -10,6 +10,12 @@ export default async function Home() {
     orderBy: { reorder_id: "asc" },
   });
 
+  // Fetch Banners configured from Theme Settings
+  const banners = await prisma.banner.findMany({
+    where: { is_available: 1 },
+    orderBy: { reorder_id: "asc" },
+  });
+
   return (
     <div className="w-full flex flex-col min-h-screen">
       {/* Hero / Slider Area */}
@@ -120,6 +126,19 @@ export default async function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Dynamic Banners from Theme Settings */}
+      {banners.length > 0 && (
+        <section className="py-12 bg-[#050505] container mx-auto px-4 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {banners.map((banner) => (
+              <div key={banner.id} className="rounded-2xl overflow-hidden shadow-2xl hover:scale-105 transition-transform duration-300">
+                <img src={banner.image} alt="Promotional Banner" className="w-full h-48 object-cover" />
+              </div>
+            ))}
           </div>
         </section>
       )}

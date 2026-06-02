@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import prisma from "@/lib/prisma";
 
-export default function Footer() {
+export default async function Footer() {
+  const settings = await prisma.settings.findFirst();
+
   return (
     <footer className="bg-[#0a0a0a] border-t border-[#222] text-zinc-400 py-16">
       <div className="container mx-auto px-4 lg:px-8">
@@ -9,21 +12,32 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-1">
             <h2 className="text-3xl font-extrabold text-white mb-4">
-              Foodefy<span className="text-red-500">.</span>
+              {settings?.footer_title || "Foodefy"}<span className="text-red-500">.</span>
             </h2>
             <p className="mb-6 leading-relaxed">
-              Delivering the best dining experience straight to your door. Fresh ingredients, masterful chefs, fast delivery.
+              {settings?.footer_description || "Delivering the best dining experience straight to your door. Fresh ingredients, masterful chefs, fast delivery."}
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
-                <i className="fa-brands fa-facebook-f"></i>
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
-                <i className="fa-brands fa-twitter"></i>
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
-                <i className="fa-brands fa-instagram"></i>
-              </a>
+              {settings?.facebook_link && (
+                <a href={settings.facebook_link} target="_blank" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
+                  <i className="fa-brands fa-facebook-f"></i>
+                </a>
+              )}
+              {settings?.twitter_link && (
+                <a href={settings.twitter_link} target="_blank" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
+                  <i className="fa-brands fa-twitter"></i>
+                </a>
+              )}
+              {settings?.instagram_link && (
+                <a href={settings.instagram_link} target="_blank" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
+                  <i className="fa-brands fa-instagram"></i>
+                </a>
+              )}
+              {settings?.tiktok_link && (
+                <a href={settings.tiktok_link} target="_blank" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors">
+                  <i className="fa-brands fa-tiktok"></i>
+                </a>
+              )}
             </div>
           </div>
 
@@ -71,7 +85,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 pt-8 border-t border-[#222] flex flex-col md:flex-row justify-between items-center text-sm">
-          <p>&copy; {new Date().getFullYear()} Foodefy. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {settings?.footer_title || "Foodefy"}. All rights reserved.</p>
           <div className="flex gap-4 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>

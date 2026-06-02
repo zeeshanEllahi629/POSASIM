@@ -40,23 +40,40 @@ export async function POST(req) {
     const qty = formData.get("qty") ? Number(formData.get("qty")) : 0;
     const item_type = formData.get("item_type") ? Number(formData.get("item_type")) : 1;
     const item_description = formData.get("item_description") || "";
-    const imageFile = formData.get("image");
+    
+    // Multiple Images Handling
+    const imageFiles = formData.getAll("images"); // Array of files
 
     if (!item_name) {
       return NextResponse.json({ status: 0, error: "Missing Name" }, { status: 400 });
     }
 
-    let imageName = "default.jpg";
-    if (imageFile && imageFile.name) {
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const ext = path.extname(imageFile.name);
-      imageName = `${Date.now()}-${Math.floor(Math.random() * 1000)}${ext}`;
-      const uploadDir = path.join(process.cwd(), "public/storage/app/public/admin-assets/images/item");
-      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-      fs.writeFileSync(path.join(uploadDir, imageName), buffer);
+    const uploadDir = path.join(process.cwd(), "public/storage/app/public/admin-assets/images/item");
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+    let mainImageName = "default.jpg";
+    const additionalImages = [];
+
+    if (imageFiles && imageFiles.length > 0) {
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+        if (file && file.name) {
+          const bytes = await file.arrayBuffer();
+          const buffer = Buffer.from(bytes);
+          const ext = path.extname(file.name);
+          const imageName = `${Date.now()}-${Math.floor(Math.random() * 1000)}${ext}`;
+          
+          fs.writeFileSync(path.join(uploadDir, imageName), buffer);
+          
+          if (i === 0) {
+            mainImageName = imageName;
+          } else {
+            additionalImages.push(imageName);
+          }
+        }
+      }
     } else if (formData.get("image_string")) {
-      imageName = formData.get("image_string");
+      mainImageName = formData.get("image_string");
     }
 
     let slug = slugify(item_name);
@@ -67,11 +84,21 @@ export async function POST(req) {
       data: {
         item_name, slug, sku, brand_id, unit_id, warranty_id, branch_id,
         alert_quantity, barcode_type, enable_description, tax_type, product_type, label_print,
-        cat_id, subcat_id, price, qty, item_type, item_description, image: imageName,
+        cat_id, subcat_id, price, qty, item_type, item_description, image: mainImageName,
         reorder_id: 0, tax: "0", avg_ratting: 0.0, discount_percentage: 0.0,
         item_status: 1, is_featured: 2, is_top_deals: 2,
       },
     });
+
+    // Save additional images
+    if (additionalImages.length > 0) {
+      await prisma.item_images.createMany({
+        data: additionalImages.map(img => ({
+          item_id: newItem.id,
+          image: img
+        }))
+      });
+    }
 
     const variationsRaw = formData.get("variations");
     if (product_type === "variable" && variationsRaw) {
@@ -79,11 +106,13 @@ export async function POST(req) {
         const parsedVariations = JSON.parse(variationsRaw);
         if (Array.isArray(parsedVariations) && parsedVariations.length > 0) {
           const variationsToInsert = parsedVariations.map(v => ({
-            item_id: newItem.id,
+            item_id: Number(newItem.id),
             name: v.name,
-            price: parseFloat(v.price) || 0,
+            price: String(v.price || 0),
             qty: parseInt(v.qty) || 0,
-            stock_management: 1
+            stock_management: 1,
+            discount_percentage: 0.0,
+            is_available: 1
           }));
           await prisma.variation.createMany({ data: variationsToInsert });
         }

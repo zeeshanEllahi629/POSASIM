@@ -1,445 +1,191 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function ThemeSettingsPage() {
-  const [activeTab, setActiveTab] = useState("general");
   const [loading, setLoading] = useState(true);
-
-  // General Settings
+  const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
-    logo: "",
-    web_primary_color: "#e7272d",
-    web_secondary_color: "#333333",
+    web_primary_color: "#00e676",
+    web_secondary_color: "#111111",
     footer_title: "",
     footer_description: "",
-    footer_logo: "",
+    facebook_link: "",
+    instagram_link: "",
+    tiktok_link: "",
   });
-  
-  // Sliders
-  const [sliders, setSliders] = useState([]);
-  const [newSlider, setNewSlider] = useState({ title: "", description: "", image: "" });
-
-  // Social Links
-  const [socialLinks, setSocialLinks] = useState([]);
-  const [newSocialLink, setNewSocialLink] = useState({ icon: "", link: "" });
+  const [banners, setBanners] = useState([]);
+  const [newBannerUrl, setNewBannerUrl] = useState("");
 
   useEffect(() => {
-    fetchSettings();
-    fetchSliders();
-    fetchSocialLinks();
+    fetchThemeData();
   }, []);
 
-  const fetchSettings = async () => {
-    try {
-      // Changed to admin2/theme
-      const res = await fetch("/api/admin2/theme");
-      const data = await res.json();
-      if (data.success && data.settings) {
+  const fetchThemeData = async () => {
+    setLoading(true);
+    const res = await fetch("/api/admin/theme");
+    const data = await res.json();
+    if (data.success) {
+      if (data.settings && data.settings.id) {
         setSettings({
-          logo: data.settings.logo || "",
-          web_primary_color: data.settings.web_primary_color || "#e7272d",
-          web_secondary_color: data.settings.web_secondary_color || "#333333",
+          web_primary_color: data.settings.web_primary_color || "#00e676",
+          web_secondary_color: data.settings.web_secondary_color || "#111111",
           footer_title: data.settings.footer_title || "",
           footer_description: data.settings.footer_description || "",
-          footer_logo: data.settings.footer_logo || "",
+          facebook_link: data.settings.facebook_link || "",
+          instagram_link: data.settings.instagram_link || "",
+          tiktok_link: data.settings.tiktok_link || "",
         });
       }
-    } catch (e) {
-      console.error(e);
+      setBanners(data.banners || []);
     }
     setLoading(false);
   };
 
-  const fetchSliders = async () => {
-    try {
-      const res = await fetch("/api/admin/sliders");
-      const data = await res.json();
-      if (data.status === 1) {
-        setSliders(data.sliders || []);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const fetchSocialLinks = async () => {
-    try {
-      const res = await fetch("/api/admin2/social-links");
-      const data = await res.json();
-      if (data.status === 1) {
-        setSocialLinks(data.links || []);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const saveSettings = async (e) => {
+  const handleSaveTheme = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin2/theme", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
-      });
-      const data = await res.json();
-      if (data.success) {
-        toast.success("Theme settings updated successfully");
-      } else {
-        toast.error("Failed to update theme settings");
-      }
-    } catch (error) {
-      toast.error("An error occurred");
+    setSaving(true);
+    const res = await fetch("/api/admin/theme", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(settings)
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast.success("Theme settings updated!");
+    } else {
+      toast.error(data.error || "Failed to update theme");
     }
-    setLoading(false);
+    setSaving(false);
   };
 
-  const addSlider = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/sliders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSlider),
-      });
-      const data = await res.json();
-      if (data.status === 1) {
-        toast.success("Slider added successfully");
-        setNewSlider({ title: "", description: "", image: "" });
-        fetchSliders();
-      } else {
-        toast.error("Failed to add slider");
-      }
-    } catch (error) {
-      toast.error("An error occurred");
-    }
-    setLoading(false);
-  };
-
-  const deleteSlider = async (id) => {
-    if (!confirm("Are you sure you want to delete this slider?")) return;
-    try {
-      const res = await fetch(`/api/admin/sliders?id=${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (data.status === 1) {
-        toast.success("Slider deleted");
-        fetchSliders();
-      } else {
-        toast.error("Failed to delete slider");
-      }
-    } catch (error) {
-      toast.error("An error occurred");
+  const handleAddBanner = async () => {
+    if (!newBannerUrl) return toast.error("Please enter an image URL");
+    const res = await fetch("/api/admin/theme", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: 'add_banner', image: newBannerUrl, type: 'home' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast.success("Banner added!");
+      setNewBannerUrl("");
+      fetchThemeData();
     }
   };
 
-  const addSocialLink = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin2/social-links", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSocialLink),
-      });
-      const data = await res.json();
-      if (data.status === 1) {
-        toast.success("Social link added");
-        setNewSocialLink({ icon: "", link: "" });
-        fetchSocialLinks();
-      } else {
-        toast.error("Failed to add social link");
-      }
-    } catch (error) {
-      toast.error("An error occurred");
-    }
-    setLoading(false);
-  };
-
-  const deleteSocialLink = async (id) => {
-    if (!confirm("Delete this social link?")) return;
-    try {
-      const res = await fetch(`/api/admin2/social-links/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (data.status === 1) {
-        toast.success("Social link deleted");
-        fetchSocialLinks();
-      } else {
-        toast.error("Failed to delete link");
-      }
-    } catch (error) {
-      toast.error("An error occurred");
+  const handleDeleteBanner = async (id) => {
+    if (!confirm("Are you sure?")) return;
+    const res = await fetch("/api/admin/theme", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: 'delete_banner', id })
+    });
+    if (res.ok) {
+      toast.success("Banner deleted!");
+      fetchThemeData();
     }
   };
 
-  if (loading && !settings.web_primary_color) {
-    return <div className="p-8 text-white">Loading...</div>;
-  }
+  if (loading) return <div className="p-6">Loading theme settings...</div>;
 
   return (
-    <div className="max-w-7xl mx-auto pb-10">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Theme & Display Settings</h1>
-      </div>
+    <div className="max-w-5xl mx-auto p-6">
+      <Toaster />
+      <h1 className="text-2xl font-bold font-display mb-6">Theme Settings & Customization</h1>
 
-      <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden mb-6">
-        <div className="flex border-b border-[#222] overflow-x-auto">
-          <button 
-            className={`px-6 py-4 whitespace-nowrap font-semibold text-sm transition-colors ${activeTab === 'general' ? 'text-[#00e676] border-b-2 border-[#00e676]' : 'text-gray-400 hover:text-white'}`}
-            onClick={() => setActiveTab('general')}
-          >
-            General Theme
-          </button>
-          <button 
-            className={`px-6 py-4 whitespace-nowrap font-semibold text-sm transition-colors ${activeTab === 'sliders' ? 'text-[#00e676] border-b-2 border-[#00e676]' : 'text-gray-400 hover:text-white'}`}
-            onClick={() => setActiveTab('sliders')}
-          >
-            Homepage Banners
-          </button>
-          <button 
-            className={`px-6 py-4 whitespace-nowrap font-semibold text-sm transition-colors ${activeTab === 'footer' ? 'text-[#00e676] border-b-2 border-[#00e676]' : 'text-gray-400 hover:text-white'}`}
-            onClick={() => setActiveTab('footer')}
-          >
-            Footer & Links
-          </button>
-        </div>
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Global Branding Form */}
+        <div className="bg-[#111] p-6 rounded-xl border border-[#222]">
+          <h2 className="text-xl font-bold mb-4">Global Branding</h2>
+          <form onSubmit={handleSaveTheme} className="space-y-4">
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Primary Color</label>
+                <div className="flex items-center gap-2">
+                  <input type="color" value={settings.web_primary_color} onChange={(e) => setSettings({...settings, web_primary_color: e.target.value})} className="h-10 w-10 bg-transparent border-0 rounded cursor-pointer" />
+                  <input type="text" value={settings.web_primary_color} onChange={(e) => setSettings({...settings, web_primary_color: e.target.value})} className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676]" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Secondary Color</label>
+                <div className="flex items-center gap-2">
+                  <input type="color" value={settings.web_secondary_color} onChange={(e) => setSettings({...settings, web_secondary_color: e.target.value})} className="h-10 w-10 bg-transparent border-0 rounded cursor-pointer" />
+                  <input type="text" value={settings.web_secondary_color} onChange={(e) => setSettings({...settings, web_secondary_color: e.target.value})} className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676]" />
+                </div>
+              </div>
+            </div>
 
-      {activeTab === "general" && (
-        <form onSubmit={saveSettings} className="bg-[#111] border border-[#222] rounded-xl p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">Website Logo URL</label>
-              <input 
-                type="text" 
-                value={settings.logo}
-                onChange={(e) => setSettings({ ...settings, logo: e.target.value })}
-                className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:border-[#00e676]" 
-                placeholder="https://example.com/logo.png" 
-              />
-              {settings.logo && (
-                <div className="mt-4 p-4 bg-white/5 rounded-lg inline-block">
-                  <img src={settings.logo} alt="Logo Preview" className="h-12 object-contain" />
-                </div>
-              )}
+              <label className="block text-sm text-gray-400 mb-1">Footer Title</label>
+              <input type="text" value={settings.footer_title} onChange={(e) => setSettings({...settings, footer_title: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676]" placeholder="Company Name Inc." />
+            </div>
+            
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Footer Description</label>
+              <textarea value={settings.footer_description} onChange={(e) => setSettings({...settings, footer_description: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676] h-20" placeholder="A short blurb about your company..."></textarea>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-400 mb-2">Primary Color (Buttons, Accents)</label>
-                <div className="flex items-center gap-3">
-                  <input 
-                    type="color" 
-                    value={settings.web_primary_color}
-                    onChange={(e) => setSettings({ ...settings, web_primary_color: e.target.value })}
-                    className="w-12 h-12 rounded cursor-pointer border-0 bg-transparent" 
-                  />
-                  <input 
-                    type="text" 
-                    value={settings.web_primary_color}
-                    onChange={(e) => setSettings({ ...settings, web_primary_color: e.target.value })}
-                    className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:border-[#00e676]" 
-                  />
-                </div>
+            <div className="space-y-3 pt-4 border-t border-[#333]">
+              <h3 className="font-semibold text-white">Social Media Links</h3>
+              <div className="flex items-center gap-3">
+                <i className="fab fa-facebook text-blue-500 text-xl w-6"></i>
+                <input type="url" value={settings.facebook_link} onChange={(e) => setSettings({...settings, facebook_link: e.target.value})} className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676]" placeholder="https://facebook.com/..." />
               </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-400 mb-2">Secondary Color (Hover states, Footers)</label>
-                <div className="flex items-center gap-3">
-                  <input 
-                    type="color" 
-                    value={settings.web_secondary_color}
-                    onChange={(e) => setSettings({ ...settings, web_secondary_color: e.target.value })}
-                    className="w-12 h-12 rounded cursor-pointer border-0 bg-transparent" 
-                  />
-                  <input 
-                    type="text" 
-                    value={settings.web_secondary_color}
-                    onChange={(e) => setSettings({ ...settings, web_secondary_color: e.target.value })}
-                    className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:border-[#00e676]" 
-                  />
-                </div>
+              <div className="flex items-center gap-3">
+                <i className="fab fa-instagram text-pink-500 text-xl w-6"></i>
+                <input type="url" value={settings.instagram_link} onChange={(e) => setSettings({...settings, instagram_link: e.target.value})} className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676]" placeholder="https://instagram.com/..." />
               </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <button type="submit" disabled={loading} className="px-8 py-3 rounded-lg font-bold text-[#0d0d0d] bg-[#00e676] hover:bg-[#00c853] transition-colors shadow-lg shadow-[#00e676]/20">
-              {loading ? "Saving..." : "Save Theme"}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {activeTab === "sliders" && (
-        <div className="space-y-6">
-          <form onSubmit={addSlider} className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Add New Banner/Slider</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Banner Text (Title)</label>
-                <input required type="text" value={newSlider.title} onChange={e => setNewSlider({...newSlider, title: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Image URL</label>
-                <input required type="text" value={newSlider.image} onChange={e => setNewSlider({...newSlider, image: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white" />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm text-gray-400 mb-1">Description</label>
-                <textarea value={newSlider.description} onChange={e => setNewSlider({...newSlider, description: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white" rows="2"></textarea>
-              </div>
-            </div>
-            <button type="submit" className="px-6 py-2 rounded font-bold text-[#0d0d0d] bg-[#00e676] hover:bg-[#00c853]">Add Banner</button>
-          </form>
-
-          <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
-            <table className="w-full text-left text-sm text-gray-300">
-              <thead className="bg-[#1a1a1a] text-gray-400 uppercase">
-                <tr>
-                  <th className="px-4 py-3">Image</th>
-                  <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#222]">
-                {sliders.map(s => (
-                  <tr key={s.id} className="hover:bg-[#1a1a1a]">
-                    <td className="px-4 py-3"><img src={s.image} alt="Slider" className="h-12 w-24 object-cover rounded" /></td>
-                    <td className="px-4 py-3 font-semibold text-white">{s.title}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button onClick={() => deleteSlider(s.id)} className="text-red-500 hover:text-red-400"><i className="fa-solid fa-trash"></i></button>
-                    </td>
-                  </tr>
-                ))}
-                {sliders.length === 0 && (
-                  <tr>
-                    <td colSpan="3" className="px-4 py-8 text-center text-gray-500">No banners added yet</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "footer" && (
-        <div className="space-y-6">
-          <form onSubmit={saveSettings} className="bg-[#111] border border-[#222] rounded-xl p-6 space-y-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Footer Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-400 mb-2">Footer Title</label>
-                  <input 
-                    type="text" 
-                    value={settings.footer_title}
-                    onChange={(e) => setSettings({ ...settings, footer_title: e.target.value })}
-                    className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:border-[#00e676]" 
-                    placeholder="e.g. About Us" 
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-400 mb-2">Footer Logo URL</label>
-                  <input 
-                    type="text" 
-                    value={settings.footer_logo}
-                    onChange={(e) => setSettings({ ...settings, footer_logo: e.target.value })}
-                    className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:border-[#00e676]" 
-                    placeholder="https://example.com/footer-logo.png" 
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-400 mb-2">Footer Description</label>
-                <textarea 
-                  value={settings.footer_description}
-                  onChange={(e) => setSettings({ ...settings, footer_description: e.target.value })}
-                  className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:border-[#00e676]" 
-                  rows="4"
-                  placeholder="Enter the short description for the footer..."
-                ></textarea>
+              <div className="flex items-center gap-3">
+                <i className="fab fa-tiktok text-white text-xl w-6"></i>
+                <input type="url" value={settings.tiktok_link} onChange={(e) => setSettings({...settings, tiktok_link: e.target.value})} className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676]" placeholder="https://tiktok.com/..." />
               </div>
             </div>
 
-            <div className="flex justify-end pt-4">
-              <button type="submit" disabled={loading} className="px-8 py-3 rounded-lg font-bold text-[#0d0d0d] bg-[#00e676] hover:bg-[#00c853] transition-colors shadow-lg shadow-[#00e676]/20">
-                {loading ? "Saving..." : "Save Footer"}
+            <div className="pt-4">
+              <button type="submit" disabled={saving} className="w-full bg-[#00e676] text-black px-6 py-3 rounded-lg font-bold hover:bg-[#00c853] transition-all disabled:opacity-50">
+                {saving ? "Saving..." : "Save Global Theme"}
               </button>
             </div>
           </form>
+        </div>
 
-          {/* Social Links Section */}
-          <div className="bg-[#111] border border-[#222] rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Social Media Links</h2>
-            <form onSubmit={addSocialLink} className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
-              <div className="md:col-span-4">
-                <label className="block text-sm text-gray-400 mb-1">FontAwesome Icon Class</label>
-                <input 
-                  required 
-                  type="text" 
-                  value={newSocialLink.icon} 
-                  onChange={e => setNewSocialLink({...newSocialLink, icon: e.target.value})} 
-                  className="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white" 
-                  placeholder="e.g. fab fa-facebook"
-                />
-              </div>
-              <div className="md:col-span-6">
-                <label className="block text-sm text-gray-400 mb-1">Social Profile Link</label>
-                <input 
-                  required 
-                  type="url" 
-                  value={newSocialLink.link} 
-                  onChange={e => setNewSocialLink({...newSocialLink, link: e.target.value})} 
-                  className="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white" 
-                  placeholder="https://facebook.com/yourpage"
-                />
-              </div>
-              <div className="md:col-span-2 flex items-end">
-                <button type="submit" className="w-full px-4 py-2 rounded font-bold text-[#0d0d0d] bg-[#00e676] hover:bg-[#00c853]">
-                  Add Link
-                </button>
-              </div>
-            </form>
+        {/* Banner Management */}
+        <div className="bg-[#111] p-6 rounded-xl border border-[#222]">
+          <h2 className="text-xl font-bold mb-4">Homepage Banners</h2>
+          
+          <div className="flex gap-2 mb-6">
+            <input 
+              type="text" 
+              value={newBannerUrl} 
+              onChange={e => setNewBannerUrl(e.target.value)} 
+              placeholder="Paste banner image URL here..."
+              className="flex-1 bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-white outline-none focus:border-[#00e676]"
+            />
+            <button onClick={handleAddBanner} className="bg-blue-600 text-white px-4 py-2 rounded font-bold hover:bg-blue-700">Add</button>
+          </div>
 
-            <div className="bg-[#1a1a1a] border border-[#333] rounded-lg overflow-hidden">
-              <table className="w-full text-left text-sm text-gray-300">
-                <thead className="bg-[#222] text-gray-400 uppercase">
-                  <tr>
-                    <th className="px-4 py-3 w-16 text-center">Icon</th>
-                    <th className="px-4 py-3">Link</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#333]">
-                  {socialLinks.map(s => (
-                    <tr key={s.id} className="hover:bg-[#252525]">
-                      <td className="px-4 py-3 text-center text-xl text-[#00e676]">
-                        <i className={s.icon}></i>
-                      </td>
-                      <td className="px-4 py-3">
-                        <a href={s.link} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">{s.link}</a>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <button onClick={() => deleteSocialLink(s.id)} className="text-red-500 hover:text-red-400">
-                          <i className="fa-solid fa-trash"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {socialLinks.length === 0 && (
-                    <tr>
-                      <td colSpan="3" className="px-4 py-6 text-center text-gray-500">No social links added yet</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className="space-y-4">
+            {banners.length === 0 ? (
+              <p className="text-gray-500 text-sm">No banners uploaded yet.</p>
+            ) : (
+              banners.map(banner => (
+                <div key={banner.id} className="relative group rounded-lg overflow-hidden border border-[#333]">
+                  <img src={banner.image} alt="Banner" className="w-full h-32 object-cover" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button onClick={() => handleDeleteBanner(banner.id)} className="bg-red-600 text-white px-4 py-2 rounded font-bold shadow-lg">
+                      <i className="fas fa-trash mr-2"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
-      )}
+
+      </div>
     </div>
   );
 }

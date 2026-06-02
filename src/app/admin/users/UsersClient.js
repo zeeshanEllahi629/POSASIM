@@ -17,6 +17,7 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [posPin, setPosPin] = useState("");
   const [roleId, setRoleId] = useState("");
   const [userType, setUserType] = useState(2); // 2 = customer, 1 = staff
   
@@ -28,6 +29,7 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
     setEmail("");
     setMobile("");
     setPassword("");
+    setPosPin("");
     setRoleId("");
     setUserType(activeTab === "staff" ? 1 : 2);
     setFormError("");
@@ -39,6 +41,7 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
     setName(user.name);
     setEmail(user.email);
     setMobile(user.mobile || "");
+    setPosPin(user.pos_pin || "");
     setRoleId(user.role_id || "");
     setFormError("");
     setShowEditModal(true);
@@ -60,6 +63,7 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
           email, 
           mobile, 
           password, 
+          pos_pin: posPin,
           type: userType, 
           role_id: userType === 1 ? roleId : null 
         }),
@@ -88,7 +92,10 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
 
     try {
       const payload = { name, email, mobile };
-      if (selectedUser.type === 1) payload.role_id = roleId;
+      if (selectedUser.type === 1) {
+        payload.role_id = roleId;
+        payload.pos_pin = posPin;
+      }
 
       const res = await fetch(`/api/admin2/users/${selectedUser.id}`, {
         method: "PUT",
@@ -255,6 +262,7 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
                 <th className="py-4 px-6">Email</th>
                 <th className="py-4 px-6">Mobile</th>
                 {activeTab === "staff" && <th className="py-4 px-6">Role</th>}
+                {activeTab === "staff" && <th className="py-4 px-6">POS PIN</th>}
                 {activeTab !== "pending" && <th className="py-4 px-6">Status</th>}
                 <th className="py-4 px-6 text-right">Actions</th>
               </tr>
@@ -286,9 +294,14 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
                   </td>
                   
                   {activeTab === "staff" && (
-                    <td className="py-4 px-6 text-blue-400 font-semibold">
-                      {roles.find(r => r.id === user.role_id)?.name || "No Role"}
-                    </td>
+                    <>
+                      <td className="py-4 px-6 text-blue-400 font-semibold">
+                        {roles.find(r => r.id === user.role_id)?.name || "No Role"}
+                      </td>
+                      <td className="py-4 px-6 text-emerald-400 font-mono font-bold tracking-widest">
+                        {user.pos_pin || "-"}
+                      </td>
+                    </>
                   )}
 
                   {activeTab !== "pending" && (
@@ -411,19 +424,31 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
               </div>
 
               {activeTab === "staff" && (
-                <div className="form-group">
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Assign Role</label>
-                  <select
-                    value={roleId}
-                    onChange={(e) => setRoleId(e.target.value)}
-                    required
-                    className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 text-sm"
-                  >
-                    <option value="">Select a Role</option>
-                    {roles.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-group">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Assign Role</label>
+                    <select
+                      value={roleId}
+                      onChange={(e) => setRoleId(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 text-sm"
+                    >
+                      <option value="">Select a Role (Optional)</option>
+                      {roles.map(r => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">POS PIN</label>
+                    <input
+                      type="text"
+                      maxLength="4"
+                      value={posPin}
+                      onChange={(e) => setPosPin(e.target.value)}
+                      placeholder="e.g. 1234"
+                      className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 text-sm"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -515,19 +540,31 @@ export default function UsersClient({ initialUsers, roles = [], error }) {
               </div>
 
               {selectedUser?.type === 1 && (
-                <div className="form-group">
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Assign Role</label>
-                  <select
-                    value={roleId}
-                    onChange={(e) => setRoleId(e.target.value)}
-                    required
-                    className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 text-sm"
-                  >
-                    <option value="">Select a Role</option>
-                    {roles.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-gray-400 text-xs font-bold mb-2">Role</label>
+                    <select
+                      value={roleId}
+                      onChange={(e) => setRoleId(e.target.value)}
+                      className="w-full px-4 py-2 bg-[#080808] border border-[#333] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 focus:ring-1 focus:ring-[#00e676]/30"
+                    >
+                      <option value="">Select Role</option>
+                      {roles.map(r => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 text-xs font-bold mb-2">POS PIN (4-Digits)</label>
+                    <input
+                      type="text"
+                      maxLength="4"
+                      value={posPin}
+                      onChange={(e) => setPosPin(e.target.value)}
+                      placeholder="e.g. 1234"
+                      className="w-full px-4 py-2 bg-[#080808] border border-[#333] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 focus:ring-1 focus:ring-[#00e676]/30"
+                    />
+                  </div>
                 </div>
               )}
 

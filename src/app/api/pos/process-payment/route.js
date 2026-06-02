@@ -78,12 +78,19 @@ export async function POST(req) {
 
       // 4. Create Order Details and Reduce Stock
       for (const cartItem of data.items) {
+        let warrantyText = "";
+        const itemRecord = await tx.item.findUnique({ where: { id: BigInt(cartItem.id) } });
+        if (itemRecord && itemRecord.warranty_id) {
+          const warranty = await tx.warranties.findUnique({ where: { id: itemRecord.warranty_id } });
+          if (warranty) warrantyText = ` (Warranty: ${warranty.name})`;
+        }
+
         await tx.order_details.create({
           data: {
             order_id: createdOrder.id,
             user_id: data.customer_id ? BigInt(data.customer_id) : null,
             item_id: BigInt(cartItem.id),
-            item_name: cartItem.name || "",
+            item_name: (cartItem.name || "") + warrantyText,
             item_image: cartItem.image || "",
             qty: (cartItem.quantity || 1).toString(),
             item_price: (cartItem.price || 0).toString(),

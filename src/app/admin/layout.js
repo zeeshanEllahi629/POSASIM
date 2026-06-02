@@ -103,6 +103,7 @@ export default function AdminLayout({ children }) {
     { name: "Add Sale", path: "/admin/sales/add", icon: "fa-file-invoice-dollar", reqPerm: "Add Sell" },
     { name: "Expenses", path: "/admin/expenses/add", icon: "fa-money-bill-wave", reqPerm: "Add expense" },
     { name: "Roles", path: "/admin/roles/add", icon: "fa-user-shield", reqPerm: "View Role" },
+    { name: "Users", path: "/admin/users", icon: "fa-users", reqPerm: "View Role" },
     { name: "Reports", path: "/admin/reports", icon: "fa-chart-bar", reqPerm: "ALL" },
     { name: "Theme Settings", path: "/admin/theme-settings", icon: "fa-paint-roller", reqPerm: "ALL" },
     { name: "Payment Gateways", path: "/admin/payment-gateways", icon: "fa-credit-card", reqPerm: "ALL" },
@@ -111,7 +112,12 @@ export default function AdminLayout({ children }) {
     { name: "Suppliers", path: "/admin/suppliers", icon: "fa-truck", reqPerm: "View all supplier" },
     { name: "Branches", path: "/admin/branches", icon: "fa-store", reqPerm: "ALL" },
     { name: "SaaS Omnichannel Sync", path: "/admin/sync-settings", icon: "fa-cloud-upload-alt", reqPerm: "ALL" },
+    { name: "China Sourcing", path: "/admin/sourcing", icon: "fa-globe-asia", reqPerm: "ALL" },
+    { name: "Import Product", path: "/admin/sourcing/import", icon: "fa-file-import", reqPerm: "ALL" },
+    { name: "Sourcing Orders", path: "/admin/sourcing/orders", icon: "fa-box-open", reqPerm: "ALL" },
+    { name: "Shipments", path: "/admin/sourcing/tracking", icon: "fa-shipping-fast", reqPerm: "ALL" },
     { name: "Print Labels", path: "/admin/print-labels", icon: "fa-barcode", reqPerm: "View product" },
+    { name: "Theme Settings", path: "/admin/theme-settings", icon: "fa-paint-brush", reqPerm: "ALL" },
     { name: "Settings", path: "/admin/settings", icon: "fa-sliders", reqPerm: "ALL" },
   ];
 

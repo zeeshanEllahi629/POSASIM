@@ -5,7 +5,7 @@ export async function PUT(req, { params }) {
   try {
     const { id } = await params;
     const body = await req.json();
-    const { name, email, mobile, role_id } = body;
+    const { name, email, mobile, role_id, pos_pin } = body;
 
     if (!name || !email) {
       return NextResponse.json({ status: 0, error: "Missing required fields" });
@@ -43,6 +43,7 @@ export async function PUT(req, { params }) {
         email,
         mobile: mobile || "",
         ...(role_id && { role_id: parseInt(role_id) }),
+        ...(pos_pin !== undefined && { pos_pin: pos_pin || null }),
       },
     });
 

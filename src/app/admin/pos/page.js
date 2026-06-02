@@ -54,6 +54,58 @@ export default function PosPage() {
 
   const searchInputRef = useRef(null);
 
+  // Auth State
+  const [posPin, setPosPin] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pinError, setPinError] = useState("");
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [staffName, setStaffName] = useState("");
+
+  useEffect(() => {
+    // Check localStorage for POS PIN auth session
+    const authed = localStorage.getItem("pos_authenticated");
+    const name = localStorage.getItem("pos_staff_name");
+    if (authed === "true") {
+      setIsAuthenticated(true);
+      setStaffName(name || "Staff");
+    }
+  }, []);
+
+  const handlePinSubmit = async () => {
+    if(posPin.length !== 4) return;
+    setIsAuthenticating(true);
+    setPinError("");
+    try {
+      const res = await fetch("/api/pos/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: posPin })
+      });
+      const data = await res.json();
+      if(data.status === 1) {
+        setIsAuthenticated(true);
+        setStaffName(data.user.name);
+        localStorage.setItem("pos_authenticated", "true");
+        localStorage.setItem("pos_staff_name", data.user.name);
+      } else {
+        setPinError(data.error || "Incorrect PIN");
+        setPosPin("");
+      }
+    } catch(err) {
+      setPinError("Connection Error");
+      setPosPin("");
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPosPin("");
+    localStorage.removeItem("pos_authenticated");
+    localStorage.removeItem("pos_staff_name");
+  };
+
   // Load initial data
   useEffect(() => {
     fetchCategories();
@@ -508,6 +560,60 @@ export default function PosPage() {
     }
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center font-sans text-white select-none">
+        <div className="bg-[#111] p-8 rounded-3xl border border-[#222] shadow-[0_0_50px_rgba(0,0,0,0.5)] max-w-sm w-full text-center animate-[fadeInUp_0.5s_ease-out]">
+          <div className="w-16 h-16 bg-[#00e676]/10 text-[#00e676] rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+            <i className="fas fa-lock"></i>
+          </div>
+          <h1 className="text-3xl font-extrabold text-white mb-2">POS Terminal</h1>
+          <p className="text-gray-400 text-sm mb-8">Enter your 4-digit PIN to unlock</p>
+          
+          <div className="flex justify-center gap-4 mb-8">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl font-bold border-2 transition-all duration-300 ${posPin.length > i ? 'border-[#00e676] bg-[#00e676]/20 text-[#00e676] shadow-[0_0_15px_rgba(0,230,118,0.3)]' : 'border-[#333] bg-[#0a0a0a]'}`}>
+                {posPin.length > i ? '•' : ''}
+              </div>
+            ))}
+          </div>
+
+          {pinError && <p className="text-red-500 text-sm mb-4 font-bold animate-pulse">{pinError}</p>}
+
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+              <button 
+                key={num} 
+                onClick={() => posPin.length < 4 && setPosPin(prev => prev + num)}
+                className="bg-[#1a1a1a] hover:bg-[#2a2a2a] active:scale-95 py-5 rounded-2xl text-2xl font-bold transition-all"
+              >
+                {num}
+              </button>
+            ))}
+            <button onClick={() => setPosPin("")} className="bg-red-950/20 text-red-500 hover:bg-red-950/40 active:scale-95 py-5 rounded-2xl text-xs font-bold transition-all tracking-wider">CLEAR</button>
+            <button onClick={() => posPin.length < 4 && setPosPin(prev => prev + "0")} className="bg-[#1a1a1a] hover:bg-[#2a2a2a] active:scale-95 py-5 rounded-2xl text-2xl font-bold transition-all">0</button>
+            <button onClick={() => setPosPin(prev => prev.slice(0, -1))} className="bg-[#1a1a1a] hover:bg-[#2a2a2a] active:scale-95 py-5 rounded-2xl text-lg font-bold transition-all text-gray-400"><i className="fas fa-backspace"></i></button>
+          </div>
+
+          <button 
+            onClick={handlePinSubmit}
+            disabled={posPin.length !== 4 || isAuthenticating}
+            className="w-full bg-[#00e676] text-[#0d0d0d] font-extrabold py-5 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#00c853] hover:shadow-[0_0_20px_rgba(0,230,118,0.4)] transition-all tracking-wide text-lg"
+          >
+            {isAuthenticating ? (
+              <span className="flex items-center justify-center gap-2">
+                <i className="fas fa-circle-notch fa-spin"></i> Verifying...
+              </span>
+            ) : "UNLOCK TERMINAL"}
+          </button>
+        </div>
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        `}} />
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0d0d0d] text-white' : 'bg-[#f4f4f4] text-black'} flex flex-col font-sans select-none transition-colors duration-300`}>
       {/* ========== HEADER ========== */}
@@ -572,6 +678,9 @@ export default function PosPage() {
           <button onClick={() => setActiveModal("customer")} className="w-8 h-8 rounded-full bg-[#117a3a] text-white flex items-center justify-center font-bold hover:bg-[#148e43]" title="Select Customer">
             <i className="fas fa-phone text-sm"></i>
           </button>
+          <Link href="/admin/print-labels" className="w-8 h-8 rounded-full bg-[#3b82f6] text-white flex items-center justify-center font-bold hover:bg-[#2563eb]" title="Print Labels">
+            <i className="fas fa-tags text-sm"></i>
+          </Link>
           <button onClick={() => window.print()} className="w-8 h-8 rounded-full bg-[#756f14] text-white flex items-center justify-center font-bold hover:bg-[#857d17]" title="Print Screen">
             <i className="fas fa-print text-sm"></i>
           </button>
@@ -581,7 +690,18 @@ export default function PosPage() {
           <button onClick={() => window.location.reload()} className="bg-white text-black px-4 py-1.5 rounded-full font-bold text-xs flex items-center gap-2 hover:bg-gray-100">
             <i className="fas fa-sync-alt"></i> Refresh
           </button>
-          <Link href="/admin/home" className="w-8 h-8 flex items-center justify-center text-white hover:text-gray-200 ml-2" title="Exit POS">
+          
+          <div className="h-8 border-l border-white/20 mx-1"></div>
+          
+          <div className="flex items-center gap-2 mr-2 bg-black/30 px-3 py-1.5 rounded-full">
+            <i className="fas fa-user-circle text-gray-300"></i>
+            <span className="text-xs font-bold">{staffName}</span>
+          </div>
+
+          <button onClick={handleLogout} className="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/60 rounded-full transition-all" title="Lock POS">
+            <i className="fas fa-lock text-sm"></i>
+          </button>
+          <Link href="/admin/home" className="w-8 h-8 flex items-center justify-center text-white hover:text-gray-200" title="Exit POS">
             <i className="fas fa-power-off text-lg"></i>
           </Link>
         </div>

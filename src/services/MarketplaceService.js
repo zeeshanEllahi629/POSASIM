@@ -38,7 +38,38 @@ class MarketplaceService {
 
   async _syncEbayInventory(sku, quantity) {
     console.log(`[eBay Inventory API] Pushing SKU ${sku} with QTY ${quantity}`);
-    return { success: true, platform: "ebay", sku, quantity };
+    
+    // eBay Inventory API endpoint
+    const endpoint = `https://api.ebay.com/sell/inventory/v1/inventory_item/${encodeURIComponent(sku)}`;
+    
+    try {
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${this.settings.access_token}`,
+          'Content-Language': 'en-US',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          availability: {
+            shipToLocationAvailability: {
+              quantity: quantity
+            }
+          },
+          condition: "NEW"
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`eBay API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+      
+      return { success: true, platform: "ebay", sku, quantity };
+    } catch (error) {
+      console.error("[eBay Error]", error.message);
+      throw error;
+    }
   }
 }
 

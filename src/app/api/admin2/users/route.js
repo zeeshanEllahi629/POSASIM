@@ -23,6 +23,7 @@ export async function GET() {
         is_verified: true,
         type: true,
         role_id: true,
+        pos_pin: true,
       },
     });
 
@@ -41,7 +42,7 @@ export async function GET() {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { name, email, mobile, password, type, role_id } = body;
+    const { name, email, mobile, password, type, role_id, pos_pin } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json({ status: 0, error: "Missing required fields" });
@@ -83,6 +84,7 @@ export async function POST(req) {
         is_available: 1,
         is_verified: newUserType === 1 ? 0 : 1, // Staff requires approval
         token: "",
+        pos_pin: pos_pin || null,
       },
     });
 

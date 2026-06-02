@@ -1,0 +1,898 @@
+
+
+
+⬡
+
+
+FlowCraft
+
+
+Embedded Workflow Engine for Any Website
+
+n8n-style visual 
+builder  •
+  50+ 
+integrations  •
+  AI 
+Agents  •
+  Website 
+mein
+ embed karo
+
+
+✓ Complete PRD + Architecture Diagrams + Flowcharts + Implementation Guide
+
+
+★ AI KO DO AUR SEEDHA CODE BANWAO — Har section 
+mein
+ ready prompts 
+hain
+
+
+
+
+
+
+SECTION 1 — ARCHITECTURE DIAGRAMS
+
+
+1.1 System Architecture — Complete Overview
+
+Yeh diagram 
+FlowCraft
+ ka 
+poora
+ system 
+dikhata
+ 
+hai
+ — Website layer se 
+lekar
+ External Services 
+tak
+.
+
+
+
+Figure 1: 
+FlowCraft
+ System Architecture — Website → Canvas UI → Engine → Integrations → External Services
+
+
+
+
+
+1.2 Workflow Execution Flow
+
+Jab koi trigger fire 
+hota
+ 
+hai
+ to workflow is process se 
+guzarta
+ 
+hai
+ — trigger se response 
+tak
+.
+
+
+
+Figure 2: Workflow Execution Flow — 8 steps from Trigger to Response
+
+
+
+
+
+1.3 Complete Integration Map — 50+ Nodes
+
+Tamam available integrations categories 
+ke
+ 
+mutabiq
+ — yeh sab nodes 
+FlowCraft
+ 
+mein
+ built-in 
+hain
+.
+
+
+
+Figure 3: 
+FlowCraft
+ Integration Map — 10 categories, 50+ nodes
+
+
+
+
+
+SECTION 2 — PRODUCT VISION
+
+
+2.1 Product Kya Hai?
+
+
+FlowCraft
+ ek embeddable workflow automation engine 
+hai
+ — 
+bilkul
+ n8n ki 
+tarah
+ — 
+lekin
+ yeh 
+aap
+ ki 
+apni
+ website ka 
+hissa
+ ban 
+jata
+ 
+hai
+.
+
+
+n8n = 
+Alag
+ application 
+jise
+ 
+alag
+ server 
+
+chahiye
+  |
+  
+FlowCraft
+ = 
+Aap
+ ki website ka built-in feature
+Feature
+n8n (Original)
+
+FlowCraft
+ (
+Aap
+ ka Product)
+Installation
+
+Alag
+ server deploy karo
+
+npm
+ install / script tag — bas
+Login
+
+Alag
+ n8n account
+
+Aap
+ ki website ka existing auth
+Hosting
+
+Aap
+ ka server 
+ya
+ n8n.cloud
+
+Aap
+ ki website 
+ke
+ 
+saath
+
+Customization
+Limited branding
+100% 
+aap
+ ka design, 
+aap
+ 
+ke
+ nodes
+Users
+Technical users mostly
+Koi 
+bhi
+ — non-technical 
+bhi
+
+Business Logic
+Generic nodes
+
+Aap
+ 
+ke
+ business 
+ke
+ custom nodes
+Integration
+Webhook se connect karo
+Direct DB, auth, APIs access
+
+
+
+
+
+SECTION 3 — EMBEDDING GUIDE (Kisi Bhi Website Mein)
+
+
+3.1 React / Next.js
+
+
+npm
+ install @flowcraft/react @flowcraft/engine
+
+
+
+import 
+{ 
+FlowCraftCanvas
+
+ } from '@
+flowcraft
+/react';
+
+
+
+&lt;
+FlowCraftCanvas
+
+
+  
+apiUrl
+='/
+api
+/
+flowcraft
+'
+
+  
+userId
+={session.user.id}
+
+  theme='dark'
+
+  
+customNodes
+={
+myNodes
+}
+
+  
+onSave
+={(
+wf
+) =&gt; 
+console.log(
+'Saved:', 
+wf
+)}
+
+/&gt;
+
+
+3.2 Vanilla HTML
+
+&lt;link 
+rel
+='stylesheet' 
+href
+='https://cdn.flowcraft.dev/latest/style.css' /&gt;
+
+&lt;div id='workflow-builder'&gt;&lt;/div&gt;
+
+&lt;script 
+src
+='https://cdn.flowcraft.dev/latest/flowcraft.js'&gt;&lt;/script&gt;
+
+&lt;script&gt;
+
+  
+FlowCraft.init
+({
+
+    container: '#workflow-builder',
+
+    
+apiUrl
+: 'https://your-backend.com/
+api
+/
+flowcraft
+',
+
+    
+userId
+: currentUser.id,
+
+    height: '80vh'
+
+  });
+
+&lt;/script&gt;
+
+
+3.3 WordPress Plugin
+
+[
+
+flowcraft
+]  ←
+ 
+shortcode
+ page 
+mein
+ dalo, bas!
+
+
+3.4 Vue.js
+
+&lt;
+
+FlowCraftCanvas
+ :
+api
+-url
+='
+apiUrl
+
+' :user
+-id='
+userId
+' /&gt;
+
+
+
+
+
+SECTION 4 — BUILT-IN NODES (50+)
+
+
+4.1 Trigger Nodes
+Node
+Description
+Key Config
+Webhook Trigger
+HTTP request 
+receive
+ karo
+Path, Method, Auth
+Schedule
+Waqt par 
+chalao
+
+Cron, 
+Timezone
+
+Chat Trigger
+Chat widget se message
+Public access, Greeting
+Form Trigger
+Form 
+submit
+ hone par
+Fields, Response
+Email Trigger (IMAP)
+Email 
+aane
+ par
+Host, Folder, SSL
+Manual
+Button click se test karo
+—
+
+
+4.2 AI / LLM Nodes
+Node
+Provider
+Key Options
+AI Agent
+Any LLM
+Model, Memory, Tools, System Prompt, Max Iterations
+LLM Call
+Any LLM
+Model, Prompt, Temperature, Max Tokens
+OpenAI
+OpenAI
+Chat, Images (DALL-E), Audio (Whisper), Embeddings
+Anthropic
+Anthropic
+claude-sonnet-4-6, claude-opus-4-6, claude-haiku-4-5
+Google Gemini
+Google
+gemini-2.0-flash, gemini-1.5-pro, gemini-2.5-pro
+Vector Search
+Pinecone/
+Qdrant
+/
+etc
+
+Store, Query, Top K
+Doc Loader (RAG)
+Any
+Source, Chunk Size, Overlap
+
+
+4.3 Communication Nodes
+Node
+Operations
+Slack
+Send Message, Send Block, Upload File, Add Reaction, Create Channel
+Telegram
+Send Message, Photo, Document, Poll, Edit Message
+WhatsApp
+Send Text, Template, Media, Buttons, List
+Discord
+Send Message, Embed, Add Role, Create Channel
+MS Teams
+Send Message, Adaptive Card, Create Team
+Twilio
+Send SMS, Make Call, Verify OTP
+
+
+4.4 Database Nodes
+Database
+Operations
+PostgreSQL
+SELECT, INSERT, UPDATE, DELETE, UPSERT, Execute Query
+MySQL
+SELECT, INSERT, UPDATE, DELETE, Execute Query
+MongoDB
+Find, 
+FindOne
+, Insert, Update, Delete, Aggregate
+Redis
+Get, Set, Delete, Expire, List Push, Hash, Pub/Sub
+
+Supabase
+
+DB CRUD, RPC, Storage Upload, Auth
+SQLite
+SELECT, INSERT, UPDATE, DELETE, Execute
+
+
+4.5 CRM Nodes
+CRM
+Key Operations
+HubSpot
+Create/Update Contact, Create Deal, Create Ticket, Add Note, Search
+Salesforce
+Create/Update/Get Record, Search, Run SOQL, Any Object
+
+Airtable
+
+List/Create/Update/Delete Records, Search
+Notion
+Create/Update Page, Query DB, Search, Append Blocks
+Monday.com
+Create/Update/Delete Item, Move to Group
+
+
+4.6 Payment Nodes
+Service
+Operations
+Stripe
+Create Payment Intent, Confirm, Customer, Subscription, Invoice, Refund, Checkout Session
+PayPal
+Create/Capture Order, Refund, Subscription, Get Transaction
+Paddle
+Get/Cancel/Update Subscription, Create Pay Link
+
+
+4.7 Social Media Nodes
+Platform
+Operations
+Twitter/X
+Post Tweet, Reply, Like, Retweet, Search, Get User, Delete
+LinkedIn
+Create Post, Company Post, Get Profile, Share Article
+Instagram
+Get Media, Profile, Insights, Reply to Comment
+YouTube
+Get Videos, Search, Get Comments, Upload Video
+
+
+4.8 Cloud Storage Nodes
+Service
+Operations
+Google Drive
+Upload, Download, List, Move, Copy, Delete, Share, Create Folder, Search
+AWS S3
+Upload, Download, Delete, List, 
+Presigned
+ URL, Copy, Create Bucket
+OneDrive
+Upload, Download, List, Move, Delete, Share Link
+Dropbox
+Upload, Download, List, Move, Copy, Delete, Get Link
+
+
+
+
+
+SECTION 5 — BACKEND ENGINE SPEC
+
+
+5.1 Database Schema
+
+CREATE TABLE workflows (
+
+  id UUID PRIMARY KEY DEFAULT 
+gen_random_
+uuid
+(
+),
+
+  
+user_id
+ 
+VARCHAR(
+255) NOT NULL,
+
+  name 
+VARCHAR(
+255) NOT NULL,
+
+  
+json_data
+ JSONB NOT NULL,
+
+  active BOOLEAN DEFAULT false,
+
+  
+created_at
+ TIMESTAMP DEFAULT 
+NOW(
+)
+
+);
+
+
+
+CREATE TABLE executions (
+
+  id UUID PRIMARY KEY,
+
+  
+workflow_id
+ UUID REFERENCES workflows(id),
+
+  status 
+VARCHAR(
+50
+),  --
+ running, success, error
+
+  
+started_at
+ TIMESTAMP,
+
+  
+finished_at
+ TIMESTAMP,
+
+  data JSONB,
+
+  
+error_message
+ TEXT
+
+);
+
+
+
+CREATE TABLE credentials (
+
+  id UUID PRIMARY KEY,
+
+  
+user_id
+ 
+VARCHAR(
+255),
+
+  name 
+VARCHAR(
+255),
+
+  
+data_encrypted
+ 
+TEXT  --
+ AES-256 encrypted
+
+);
+
+
+5.2 REST API Endpoints
+Method
+Endpoint
+Description
+GET
+/
+api
+/workflows
+User 
+ke
+ workflows list
+POST
+/
+api
+/workflows
+Naya workflow 
+create
+
+PUT
+/
+
+api
+
+/workflows/:id
+Workflow update
+DELETE
+/
+
+api
+
+/workflows/:id
+Workflow delete
+POST
+/
+
+api
+
+/workflows/:id/execute
+Manually execute
+GET
+/
+api
+/nodes
+Available nodes list
+POST
+/
+
+api
+
+/webhooks
+/:path
+
+Webhook receive
+GET
+/
+
+api
+
+/executions/:id/logs
+Live logs (SSE)
+POST
+/
+api
+/credentials
+Credential save
+
+
+
+
+
+SECTION 6 — SECURITY
+Area
+Implementation
+Credentials Encryption
+AES-256-GCM — keys 
+kabhi
+ plain text 
+mein
+ 
+nahi
+
+API Authentication
+JWT tokens — 
+har
+ request verify
+User Isolation
+Row-Level Security — user 
+sirf
+ 
+apna
+ data 
+dekhe
+
+Webhook Security
+HMAC signatures verify karo
+Code Execution
+Sandboxed VM (vm2 
+ya
+ isolated-
+vm
+) — no 
+eval(
+)
+Rate Limiting
+Per-user execution limits
+Input Validation
+Zod schemas — 
+har
+ input validate
+CORS
+Allowed origins whitelist
+
+
+★ Code Node 
+mein
+ user ka code SANDBOX 
+mein
+ 
+chalao
+ — direct Node.js eval KABHI MAT KARO
+
+
+
+
+
+SECTION 7 — IMPLEMENTATION ROADMAP
+Phase
+Duration
+Deliverables
+Phase 1: MVP
+4-6 weeks
+Canvas UI + 10 nodes + Webhook + Schedule + PostgreSQL
+Phase 2: AI
+3-4 weeks
+AI Agent + LLM nodes + Memory + Tools
+Phase 3: Integrations
+4-6 weeks
+Email, Slack, DB nodes + Credential manager
+Phase 4: Embed
+2-3 weeks
+
+npm
+ package + Script tag + WordPress plugin
+Phase 5: Custom Nodes
+2-3 weeks
+Custom node SDK + CLI + Documentation
+Phase 6: Enterprise
+4-6 weeks
+Multi-tenant + RBAC + Audit logs + Analytics
+
+
+
+
+
+SECTION 8 — AI KO DENE KE READY PROMPTS
+
+
+PROMPT 1 — Complete MVP:
+
+
+Is spec 
+ke
+ 
+mutabiq
+ 
+FlowCraft
+ ka complete MVP 
+banao
+. Stack: React + 
+ReactFlow
+ (frontend), Node.js + Express + PostgreSQL (backend). Pehle project structure, 
+phir
+ Canvas component, 
+phir
+ Execution Engine. TypeScript 
+mein
+. Har file ka code 
+dena
+.
+
+
+PROMPT 2 — Canvas UI Only:
+
+
+
+FlowCraft
+ React frontend 
+banao
+. 
+ReactFlow
+ use karo. Components: 
+WorkflowCanvas
+, 
+NodeSidebar
+ (categories 
+ke
+ 
+saath
+), 
+NodePropertiesPanel
+, Toolbar. 50+ nodes with icons. Dark theme. Tailwind CSS. AI node category included.
+
+
+PROMPT 3 — Backend Engine:
+
+
+
+FlowCraft
+ Node.js execution engine 
+banao
+. TypeScript + 
+Fastify
+ + PostgreSQL + 
+BullMQ
+. Features: Workflow CRUD API, Execution engine, WebSocket live updates, Webhook handler, Credential encryption. DB schema 
+bhi
+ 
+dena
+.
+
+
+PROMPT 4 — 
+npm
+ Package:
+
+
+
+FlowCraft
+ 
+npm
+ package 
+banao
+: @flowcraft/react aur @flowcraft/engine. React component props: 
+apiUrl
+, 
+userId
+, theme, 
+customNodes
+. Engine: class-based API. TypeScript types. README with examples.
+
+
+PROMPT 5 — WordPress Plugin:
+
+
+
+FlowCraft
+ WordPress plugin 
+banao
+. PHP + WP REST API. Features: 
+shortcode
+ [
+flowcraft
+], admin settings page, user meta 
+mein
+ workflows save, current user ID auto pass. Gutenberg block 
+bhi
+ 
+banao
+.
+
+
+PROMPT 6 — Custom Node SDK:
+
+
+
+FlowCraft
+ custom node SDK 
+banao
+. TypeScript interface: 
+NodeDefinition
+. CLI: 
+npx
+ 
+flowcraft
+ create-node 
+MyNodeName
+. Auto-generate boilerplate. Validation utilities. Example: Stripe custom node.
+
+
+
+
+⬡ DOCUMENT COMPLETE ⬡
+
+
+FlowCraft
+ — Complete PRD with Architecture Diagrams
+

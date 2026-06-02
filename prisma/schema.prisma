@@ -240,42 +240,43 @@ model global_extras {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model item {
-  id                  BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id                  BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
   reorder_id          Int
   cat_id              Int
   subcat_id           Int
-  item_name           String    @db.VarChar(255)
-  slug                String    @db.VarChar(255)
-  sku                 String?   @db.VarChar(100)
-  brand_id            Int?      @db.UnsignedInt
-  unit_id             Int?      @db.UnsignedInt
-  warranty_id         Int?      @db.UnsignedInt
-  branch_id           Int?      @db.UnsignedInt
-  alert_quantity      Int?      @default(0)
-  barcode_type        String?   @default("C128") @db.VarChar(50)
-  enable_description  Int?      @default(1)
-  tax_type            String?   @default("inclusive") @db.VarChar(20)
-  product_type        String?   @default("single") @db.VarChar(20)
-  label_print         Int?      @default(1)
-  image               String?   @db.VarChar(255)
+  item_name           String            @db.VarChar(255)
+  slug                String            @db.VarChar(255)
+  sku                 String?           @db.VarChar(100)
+  brand_id            Int?              @db.UnsignedInt
+  unit_id             Int?              @db.UnsignedInt
+  warranty_id         Int?              @db.UnsignedInt
+  branch_id           Int?              @db.UnsignedInt
+  alert_quantity      Int?              @default(0)
+  barcode_type        String?           @default("C128") @db.VarChar(50)
+  enable_description  Int?              @default(1)
+  tax_type            String?           @default("inclusive") @db.VarChar(20)
+  product_type        String?           @default("single") @db.VarChar(20)
+  label_print         Int?              @default(1)
+  image               String?           @db.VarChar(255)
   item_type           Int?
-  has_extras          Int?      @default(2)
-  price               Float?    @default(0) @db.Float
+  has_extras          Int?              @default(2)
+  price               Float?            @default(0) @db.Float
   qty                 Int?
-  original_price      String?   @default("0") @db.VarChar(255)
-  addons_id           String?   @db.VarChar(255)
-  item_description    String?   @db.LongText
-  item_allergens      String?   @db.LongText
-  preparation_time    String?   @db.VarChar(255)
-  tax                 String    @db.VarChar(255)
-  video_url           String?   @db.VarChar(255)
-  avg_ratting         Float     @db.Float
-  discount_percentage Float     @db.Float
-  item_status         Int       @default(1)
-  is_featured         Int?      @default(2)
-  is_top_deals        Int       @default(2)
-  created_at          DateTime? @db.Timestamp(0)
-  updated_at          DateTime? @db.Timestamp(0)
+  original_price      String?           @default("0") @db.VarChar(255)
+  addons_id           String?           @db.VarChar(255)
+  item_description    String?           @db.LongText
+  item_allergens      String?           @db.LongText
+  preparation_time    String?           @db.VarChar(255)
+  tax                 String            @db.VarChar(255)
+  video_url           String?           @db.VarChar(255)
+  avg_ratting         Float             @db.Float
+  discount_percentage Float             @db.Float
+  item_status         Int               @default(1)
+  is_featured         Int?              @default(2)
+  is_top_deals        Int               @default(2)
+  created_at          DateTime?         @db.Timestamp(0)
+  updated_at          DateTime?         @db.Timestamp(0)
+  sourcingProducts    SourcingProduct[]
 }
 
 model item_images {
@@ -396,6 +397,7 @@ model order {
   additional_expense_name   String?             @db.VarChar(255)
   additional_expense_amount Decimal             @default(0.00) @db.Decimal(10, 2)
   pay_term                  String?             @db.VarChar(50)
+  purchaseOrders            PurchaseOrder[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -724,6 +726,9 @@ model settings {
   online_table_booking_email_message        String?  @db.LongText
   online_table_booking_accept_email_message String?  @db.LongText
   online_table_booking_reject_email_message String?  @db.LongText
+  facebook_link                             String?  @db.VarChar(255)
+  instagram_link                            String?  @db.VarChar(255)
+  tiktok_link                               String?  @db.VarChar(255)
   created_at                                DateTime @default(now()) @db.Timestamp(0)
   updated_at                                DateTime @default(now()) @db.Timestamp(0)
 }
@@ -923,6 +928,7 @@ model users {
   is_verified     Int?
   is_deleted      Int         @default(2)
   remember_token  String?     @db.Text
+  pos_pin         String?     @db.VarChar(4)
   license_type    String?     @db.VarChar(255)
   created_at      DateTime?   @db.Timestamp(0)
   updated_at      DateTime?   @db.Timestamp(0)
@@ -1194,10 +1200,10 @@ model units {
 }
 
 model warranties {
-  id            Int       @id @default(autoincrement()) @db.UnsignedInt
-  name          String    @db.VarChar(255)
-  description   String?   @db.Text
-  updated_at    DateTime? @db.Timestamp(0)
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String    @db.VarChar(255)
+  description String?   @db.Text
+  updated_at  DateTime? @db.Timestamp(0)
 }
 
 model ai_chat_memory {
@@ -1209,44 +1215,117 @@ model ai_chat_memory {
 }
 
 model ai_agent_logs {
-  id           Int      @id @default(autoincrement())
-  workflow_id  String   @db.VarChar(255)
-  node_name    String   @db.VarChar(255)
-  action       String   @db.VarChar(255)
-  payload      String   @db.LongText
-  status       String   @db.VarChar(50)
-  created_at   DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  workflow_id String   @db.VarChar(255)
+  node_name   String   @db.VarChar(255)
+  action      String   @db.VarChar(255)
+  payload     String   @db.LongText
+  status      String   @db.VarChar(50)
+  created_at  DateTime @default(now())
 }
 
 model sync_log {
-  id             Int      @id @default(autoincrement())
-  platform       String   @db.VarChar(50)
-  action         String   @db.VarChar(50)
-  status         String   @db.VarChar(20)
-  target_id      String?  @db.VarChar(100)
-  payload        String?  @db.LongText
-  error_message  String?  @db.LongText
-  created_at     DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  platform      String   @db.VarChar(50)
+  action        String   @db.VarChar(50)
+  status        String   @db.VarChar(20)
+  target_id     String?  @db.VarChar(100)
+  payload       String?  @db.LongText
+  error_message String?  @db.LongText
+  created_at    DateTime @default(now())
 }
 
 model marketplace_settings {
-  id             Int      @id @default(autoincrement())
-  client_id      Int?     @default(1)
-  platform       String   @db.VarChar(50)
-  api_key        String?  @db.VarChar(255)
-  api_secret     String?  @db.VarChar(255)
-  access_token   String?  @db.LongText
-  refresh_token  String?  @db.LongText
-  is_active      Int      @default(0)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @default(now()) @updatedAt
+  id            Int      @id @default(autoincrement())
+  client_id     Int?     @default(1)
+  platform      String   @db.VarChar(50)
+  api_key       String?  @db.VarChar(255)
+  api_secret    String?  @db.VarChar(255)
+  access_token  String?  @db.LongText
+  refresh_token String?  @db.LongText
+  is_active     Int      @default(0)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
 }
 
 model social_catalog {
+  id          Int       @id @default(autoincrement())
+  item_id     BigInt    @db.UnsignedBigInt
+  platform    String    @db.VarChar(50)
+  platform_id String?   @db.VarChar(255)
+  sync_status String    @default("pending") @db.VarChar(20)
+  last_synced DateTime?
+}
+
+model SourcingProduct {
   id             Int      @id @default(autoincrement())
-  item_id        BigInt   @db.UnsignedBigInt
-  platform       String   @db.VarChar(50)
-  platform_id    String?  @db.VarChar(255)
-  sync_status    String   @default("pending") @db.VarChar(20)
-  last_synced    DateTime?
+  productId      BigInt?  @db.UnsignedBigInt
+  sourceUrl      String   @db.Text
+  sourceType     String   @db.VarChar(50)
+  agentUrl       String?  @db.Text
+  preferredAgent String?  @db.VarChar(50)
+  sourceName     String   @db.VarChar(255)
+  sourceImages   Json?
+  sourcePriceRmb Decimal? @db.Decimal(10, 2)
+  sourceVariants Json?
+  supplierInfo   Json?
+  sellingPrice   Decimal? @db.Decimal(10, 2)
+  margin         Decimal? @db.Decimal(5, 2)
+  notes          String?  @db.Text
+  status         String   @default("draft") @db.VarChar(50)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  product        item?           @relation(fields: [productId], references: [id])
+  purchaseOrders PurchaseOrder[]
+}
+
+model SourcingAgent {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique @db.VarChar(50)
+  displayName String  @db.VarChar(100)
+  websiteUrl  String  @db.VarChar(255)
+  loginUrl    String  @db.VarChar(255)
+  isActive    Boolean @default(true)
+  notes       String? @db.Text
+}
+
+model PurchaseOrder {
+  id                Int      @id @default(autoincrement())
+  sourcingProductId Int
+  orderId           BigInt   @db.UnsignedBigInt
+  agentName         String   @db.VarChar(50)
+  agentOrderId      String?  @db.VarChar(100)
+  agentOrderUrl     String?  @db.Text
+  quantity          Int      @default(1)
+  unitCostRmb       Decimal? @db.Decimal(10, 2)
+  totalCostRmb      Decimal? @db.Decimal(10, 2)
+  shippingCost      Decimal? @db.Decimal(10, 2)
+  status            String   @default("pending") @db.VarChar(50)
+  agentNotes        String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  sourcingProduct SourcingProduct @relation(fields: [sourcingProductId], references: [id])
+  order           order           @relation(fields: [orderId], references: [id])
+  shipment        Shipment?
+}
+
+model Shipment {
+  id              Int       @id @default(autoincrement())
+  purchaseOrderId Int       @unique
+  trackingNumber  String    @db.VarChar(100)
+  carrier         String?   @db.VarChar(50)
+  trackingStatus  String    @default("pending") @db.VarChar(50)
+  transitStatus   String?   @db.VarChar(50)
+  lastEvent       String?   @db.Text
+  lastEventTime   DateTime?
+  estimatedDeli   DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  track17Id       String?   @db.VarChar(100)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
 }
