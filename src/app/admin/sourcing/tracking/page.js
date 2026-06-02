@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function TrackingPage() {
+function TrackingForm() {
   const searchParams = useSearchParams();
   const initialPo = searchParams.get('po') || "";
   
@@ -98,5 +98,13 @@ export default function TrackingPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function TrackingPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-white text-center">Loading tracker...</div>}>
+      <TrackingForm />
+    </Suspense>
   );
 }
