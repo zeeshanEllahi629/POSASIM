@@ -341,33 +341,40 @@ export default function CheckoutPage() {
             {/* Payment Method */}
             <div className="bg-[#111] border border-[#222] rounded-2xl shadow-sm p-6 md:p-8">
               <h3 className="font-bold text-xl mb-6 text-white border-b border-[#333] pb-4">Payment Method</h3>
-              <div className="space-y-4">
-                {paymentGateways.length > 0 ? (
-                  paymentGateways.map(gateway => (
-                    <label key={gateway.id} className="flex items-center p-4 border border-[#333] rounded-xl cursor-pointer hover:bg-[#222] transition-colors">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value={gateway.payment_name}
-                        checked={formData.paymentMethod === gateway.payment_name}
-                        onChange={handleInputChange}
-                        className="w-5 h-5 text-red-600 focus:ring-red-500" 
-                      />
-                      <div className="ml-4 flex-1 flex justify-between items-center">
-                        <span className="font-bold text-white">{gateway.payment_name}</span>
-                        {gateway.payment_name === 'Stripe' && (
-                          <div className="flex gap-2">
-                            <i className="fa-brands fa-cc-visa text-2xl text-blue-800"></i>
-                            <i className="fa-brands fa-cc-mastercard text-2xl text-orange-600"></i>
-                          </div>
-                        )}
-                        {gateway.payment_name === 'Paypal' && <i className="fa-brands fa-paypal text-2xl text-blue-400"></i>}
-                        {gateway.payment_name.toLowerCase().includes('cash') && <i className="fa-solid fa-money-bill-wave text-2xl text-green-600"></i>}
-                      </div>
-                    </label>
-                  ))
-                ) : (
-                  <p className="text-zinc-400">No payment methods available.</p>
+              <div>
+                <label className="block text-sm font-bold text-zinc-400 mb-2">Select Payment Method *</label>
+                <select
+                  name="paymentMethod"
+                  value={formData.paymentMethod}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-[#222] text-white border border-[#333] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow appearance-none"
+                >
+                  {paymentGateways.length > 0 ? (
+                    paymentGateways.map(gateway => (
+                      <option key={gateway.id} value={gateway.payment_name}>
+                        {gateway.payment_name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">No payment methods available</option>
+                  )}
+                </select>
+                {/* Visual indicators for selected method */}
+                {formData.paymentMethod && (
+                  <div className="mt-4 p-4 border border-[#333] rounded-xl flex items-center justify-between bg-[#1a1a1a]">
+                    <span className="font-bold text-white">{formData.paymentMethod}</span>
+                    <div className="flex gap-2">
+                      {formData.paymentMethod === 'Stripe' && (
+                        <>
+                          <i className="fa-brands fa-cc-visa text-3xl text-blue-800"></i>
+                          <i className="fa-brands fa-cc-mastercard text-3xl text-orange-600"></i>
+                        </>
+                      )}
+                      {formData.paymentMethod === 'Paypal' && <i className="fa-brands fa-paypal text-3xl text-blue-400"></i>}
+                      {formData.paymentMethod.toLowerCase().includes('cash') && <i className="fa-solid fa-money-bill-wave text-3xl text-green-600"></i>}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

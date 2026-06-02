@@ -48,8 +48,9 @@ export default function PosPage() {
   const [theme, setTheme] = useState("dark");
   const [loadingAddProduct, setLoadingAddProduct] = useState(false);
   const [loadingAddCategory, setLoadingAddCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [newProduct, setNewProduct] = useState({ name: "", price: "", category_id: "" });
+  const [newCategory, setNewCategory] = useState({ name: "", image: null });
+  const [newProduct, setNewProduct] = useState({ id: null, name: "", price: "", category_id: "", description: "", image: null });
+  const [editingProduct, setEditingProduct] = useState(false);
 
   const searchInputRef = useRef(null);
 
@@ -116,6 +117,48 @@ export default function PosPage() {
     if (dateEl) dateEl.innerText = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
     if (timeEl) timeEl.innerText = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   };
+
+  // Barcode Scanner Integration
+  useEffect(() => {
+    let barcodeStr = "";
+    let lastKeyTime = Date.now();
+
+    const handleScanner = (e) => {
+      // Don't intercept if user is typing in an input/textarea
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+      const char = e.key;
+      const currentTime = Date.now();
+
+      // Physical barcode scanners send keystrokes extremely fast (< 30ms between strokes)
+      if (currentTime - lastKeyTime > 30) {
+        barcodeStr = "";
+      }
+      lastKeyTime = currentTime;
+
+      if (char === "Shift" || char === "Control" || char === "Alt" || char === "Meta") return;
+
+      if (char === "Enter" && barcodeStr.length >= 3) {
+        e.preventDefault();
+        const scannedItem = items.find(
+          (item) => item.sku === barcodeStr || item.id.toString() === barcodeStr
+        );
+        if (scannedItem) {
+          addToCart(scannedItem);
+          toast.success(`Scanned: ${scannedItem.item_name}`);
+        } else {
+          toast.error(`Item not found for barcode: ${barcodeStr}`);
+        }
+        barcodeStr = "";
+      } else if (char.length === 1) {
+        barcodeStr += char;
+      }
+    };
+
+    window.addEventListener("keydown", handleScanner);
+    return () => window.removeEventListener("keydown", handleScanner);
+  }, [items, cart]); // Re-bind when items or cart changes so addToCart gets latest state
+
 
   const fetchCategories = async () => {
     try {
@@ -521,7 +564,6 @@ export default function PosPage() {
               <i className="fas fa-cash-register"></i> {till.is_open ? "Close Till" : "Open Till"}
             </button>
           </div>
-        </div>
 
         <div className="flex items-center gap-3">
           <Link href="/admin/orders" className="w-8 h-8 rounded-full bg-[#756f14] text-white flex items-center justify-center font-bold hover:bg-[#857d17]">
@@ -613,7 +655,7 @@ export default function PosPage() {
                       e.stopPropagation();
                       if(!confirm("Are you sure you want to delete this category?")) return;
                       try {
-                        const res = await fetch(`/api/admin/categories/${cat.id}`, { method: 'DELETE' });
+                        const res = await fetch(`/api/admin2/categories/${cat.id}`, { method: 'DELETE' });
                         if(res.ok) {
                           fetchCategories();
                           if(selectedCategory === cat.id) setSelectedCategory("all");
@@ -649,19 +691,39 @@ export default function PosPage() {
                 onClick={() => addToCart(item)}
                 className="bg-[#111111] border border-[#222222] hover:border-[#00e676]/50 rounded-xl p-3 flex flex-col cursor-pointer hover:shadow-lg hover:shadow-[#00e676]/5 transition-all group h-fit relative"
               >
-                <button 
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    if(!confirm("Are you sure you want to delete this product?")) return;
-                    try {
-                      const res = await fetch(`/api/admin/products/${item.id}`, { method: 'DELETE' });
-                      if(res.ok) fetchItems();
-                    } catch(err) { console.error(err); }
-                  }}
-                  className="absolute top-2 right-2 z-20 bg-black/70 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-md"
-                >
-                  <i className="fas fa-trash-alt text-xs"></i>
-                </button>
+                <div className="absolute top-2 right-2 z-20 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                  <button 
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setEditingProduct(true);
+                      setNewProduct({
+                        id: item.id,
+                        name: item.item_name,
+                        price: item.price,
+                        category_id: item.cat_id,
+                        description: item.item_description || "",
+                        image: null
+                      });
+                      setActiveModal("add-product");
+                    }}
+                    className="bg-blue-600/90 hover:bg-blue-500 text-white w-7 h-7 flex items-center justify-center rounded-full shadow-md"
+                  >
+                    <i className="fas fa-pencil-alt text-xs"></i>
+                  </button>
+                  <button 
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if(!confirm("Are you sure you want to delete this product?")) return;
+                      try {
+                        const res = await fetch(`/api/admin/products/${item.id}`, { method: 'DELETE' });
+                        if(res.ok) fetchItems();
+                      } catch(err) { console.error(err); }
+                    }}
+                    className="bg-black/70 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-full shadow-md"
+                  >
+                    <i className="fas fa-trash-alt text-xs"></i>
+                  </button>
+                </div>
                 <div className="h-48 bg-[#1a1a1a] rounded-lg overflow-hidden relative mb-3">
                   {item.image ? (
                     <img
@@ -708,6 +770,7 @@ export default function PosPage() {
                 <p>No products found matching filters</p>
               </div>
             )}
+            </div>
           </div>
         </section>
 
@@ -1437,28 +1500,54 @@ export default function PosPage() {
           <div className="bg-[#1a1a1a] rounded-xl w-full max-w-sm overflow-hidden flex flex-col shadow-2xl border border-gray-700">
             <div className="bg-[#111] p-4 flex justify-between items-center border-b border-gray-800">
               <h3 className="font-bold text-white uppercase tracking-wider"><i className="fas fa-folder-plus text-[#00e676] mr-2"></i> Quick Add Category</h3>
-              <button onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-red-500 transition-colors">
+              <button onClick={() => { setActiveModal(null); setNewCategory({name: "", image: null}); }} className="text-gray-400 hover:text-red-500 transition-colors">
                 <i className="fas fa-times text-xl"></i>
               </button>
             </div>
-            <div className="p-6">
+            <div className="p-6 space-y-4">
               <input 
                 type="text" 
                 placeholder="Category Name" 
-                value={newCategoryName}
-                onChange={e => setNewCategoryName(e.target.value)}
-                className="w-full bg-[#111] border border-gray-700 text-white p-3 rounded mb-4" 
+                value={newCategory.name}
+                onChange={e => setNewCategory({...newCategory, name: e.target.value})}
+                className="w-full bg-[#111] border border-gray-700 text-white p-3 rounded" 
               />
+              <div className="border border-gray-700 p-3 rounded bg-[#111]">
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Category Image</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={e => setNewCategory({...newCategory, image: e.target.files[0]})}
+                  className="w-full text-white text-sm" 
+                />
+              </div>
               <button 
                 onClick={async () => {
-                  if(!newCategoryName) return alert("Enter name");
+                  if(!newCategory.name) return alert("Enter name");
                   setLoadingAddCategory(true);
-                  // Mock API call for now or connect to real API
-                  alert("Add Category API needs to be implemented. Name: " + newCategoryName);
+                  try {
+                    const formData = new FormData();
+                    formData.append("category_name", newCategory.name);
+                    if (newCategory.image) formData.append("image", newCategory.image);
+
+                    const res = await fetch("/api/admin2/categories", {
+                      method: "POST",
+                      body: formData
+                    });
+                    const data = await res.json();
+                    if (data.status === 1) {
+                      setCategories(prev => [...prev, data.category]);
+                      setNewCategory({name: "", image: null});
+                      setActiveModal(null);
+                    } else {
+                      alert("Error: " + data.error);
+                    }
+                  } catch (err) {
+                    alert("Failed to add category");
+                  }
                   setLoadingAddCategory(false);
-                  setActiveModal(null);
                 }}
-                className="w-full bg-[#00e676] text-black font-bold py-3 rounded hover:bg-[#00c853] transition-colors"
+                className="w-full bg-[#00e676] text-black font-bold py-3 rounded hover:bg-[#00c853] transition-colors mt-2"
               >
                 {loadingAddCategory ? "Saving..." : "Save Category"}
               </button>
@@ -1472,8 +1561,8 @@ export default function PosPage() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-[#1a1a1a] rounded-xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl border border-gray-700">
             <div className="bg-[#111] p-4 flex justify-between items-center border-b border-gray-800">
-              <h3 className="font-bold text-white uppercase tracking-wider"><i className="fas fa-box-open text-[#00e676] mr-2"></i> Quick Add Product</h3>
-              <button onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-red-500 transition-colors">
+              <h3 className="font-bold text-white uppercase tracking-wider"><i className={`fas ${editingProduct ? "fa-pencil-alt text-blue-500" : "fa-box-open text-[#00e676]"} mr-2`}></i> {editingProduct ? "Edit Product" : "Quick Add Product"}</h3>
+              <button onClick={() => { setActiveModal(null); setEditingProduct(false); setNewProduct({ id: null, name: "", price: "", category_id: "", description: "", image: null }); }} className="text-gray-400 hover:text-red-500 transition-colors">
                 <i className="fas fa-times text-xl"></i>
               </button>
             </div>
@@ -1500,18 +1589,74 @@ export default function PosPage() {
                 <option value="">Select Category</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.category_name}</option>)}
               </select>
+              <textarea
+                placeholder="Product Description (optional)"
+                value={newProduct.description}
+                onChange={e => setNewProduct({...newProduct, description: e.target.value})}
+                className="w-full bg-[#111] border border-gray-700 text-white p-3 rounded min-h-[80px]"
+              ></textarea>
+              <div className="border border-gray-700 p-3 rounded bg-[#111]">
+                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Product Image</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={e => setNewProduct({...newProduct, image: e.target.files[0]})}
+                  className="w-full text-white text-sm" 
+                />
+              </div>
               <button 
                 onClick={async () => {
-                  if(!newProduct.name || !newProduct.price) return alert("Enter details");
+                  if(!newProduct.name || !newProduct.price || !newProduct.category_id) return alert("Enter required details");
                   setLoadingAddProduct(true);
-                  // Mock API call for now or connect to real API
-                  alert("Add Product API needs to be implemented.");
+                  try {
+                    const formData = new FormData();
+                    formData.append("item_name", newProduct.name);
+                    formData.append("price", newProduct.price);
+                    formData.append("cat_id", newProduct.category_id);
+                    formData.append("item_description", newProduct.description);
+                    if (newProduct.image) formData.append("image", newProduct.image);
+                    
+                    if (editingProduct) {
+                      const existingItem = items.find(i => i.id === newProduct.id);
+                      if (existingItem) {
+                        formData.append("qty", existingItem.qty);
+                        formData.append("item_type", existingItem.item_type);
+                      }
+                      const res = await fetch(`/api/admin/products/${newProduct.id}`, {
+                        method: "PUT",
+                        body: formData
+                      });
+                      const data = await res.json();
+                      if (data.status === 1) {
+                        fetchItems();
+                        setNewProduct({ id: null, name: "", price: "", category_id: "", description: "", image: null });
+                        setEditingProduct(false);
+                        setActiveModal(null);
+                      } else {
+                        alert("Error: " + data.error);
+                      }
+                    } else {
+                      const res = await fetch("/api/admin/products", {
+                        method: "POST",
+                        body: formData
+                      });
+                      const data = await res.json();
+                      if (data.status === 1) {
+                        fetchItems();
+                        setNewProduct({ id: null, name: "", price: "", category_id: "", description: "", image: null });
+                        setActiveModal(null);
+                      } else {
+                        alert("Error: " + data.error);
+                      }
+                    }
+                  } catch (err) {
+                    alert(`Failed to ${editingProduct ? "update" : "add"} product`);
+                  }
                   setLoadingAddProduct(false);
-                  setActiveModal(null);
                 }}
-                className="w-full bg-[#00e676] text-black font-bold py-3 rounded hover:bg-[#00c853] transition-colors mt-2"
+                className={`w-full ${editingProduct ? "bg-blue-500 hover:bg-blue-600" : "bg-[#00e676] hover:bg-[#00c853]"} text-white font-bold py-3 rounded transition-colors mt-2`}
               >
-                {loadingAddProduct ? "Saving..." : "Save Product"}
+                {loadingAddProduct ? "Saving..." : (editingProduct ? "Update Product" : "Save Product")}
               </button>
             </div>
           </div>

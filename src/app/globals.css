@@ -58,3 +58,22 @@ body {
   background-color: #6366f1;
 }
 
+/* Light Theme (Shopify-style) Overrides */
+body.light-theme { background-color: #f4f6f8 !important; color: #202223 !important; }
+body.light-theme [class*="bg-[#0d0d0d]"] { background-color: #f4f6f8 !important; color: #202223 !important; }
+body.light-theme [class*="bg-[#050505]"] { background-color: #ffffff !important; }
+body.light-theme [class*="bg-[#111111]"], body.light-theme [class*="bg-[#111]"] { background-color: #ffffff !important; box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; border-color: #e1e3e5 !important; }
+body.light-theme [class*="bg-[#1a1a1a]"] { background-color: #f9fafb !important; border-color: #e1e3e5 !important; }
+body.light-theme [class*="bg-[#222]"] { background-color: #e1e3e5 !important; border-color: #d1d5db !important; }
+body.light-theme [class*="border-[#222222]"], body.light-theme [class*="border-[#222]"] { border-color: #e1e3e5 !important; }
+body.light-theme [class*="border-[#333]"] { border-color: #d1d5db !important; }
+body.light-theme [class*="border-[#444]"] { border-color: #c1c5cb !important; }
+body.light-theme [class*="text-white"] { color: #202223 !important; }
+body.light-theme [class*="text-gray-400"], body.light-theme [class*="text-gray-300"] { color: #6d7175 !important; }
+body.light-theme [class*="hover:bg-[#111111]"]:hover, body.light-theme [class*="hover:bg-[#111]"]:hover { background-color: #f4f6f8 !important; color: #000 !important; }
+body.light-theme [class*="hover:text-white"]:hover { color: #000 !important; }
+body.light-theme input, body.light-theme textarea, body.light-theme select { color: #202223 !important; }
+body.light-theme .group.bg-\[\#00e676\]\/10 { background-color: #f4f6f8 !important; border-color: #e1e3e5 !important; }
+body.light-theme th { background-color: #f4f6f8 !important; color: #6d7175 !important; border-color: #e1e3e5 !important; }
+body.light-theme tr { border-color: #e1e3e5 !important; }
+body.light-theme tr:hover { background-color: #f9fafb !important; }

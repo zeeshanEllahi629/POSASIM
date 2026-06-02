@@ -299,18 +299,28 @@ export const ConfigModal = ({ nodeId, onClose }: ConfigModalProps) => {
                 </div>
               )}
 
-              {isOpenAI && (
-                <div className="pt-4 border-t border-[#222] space-y-4">
+              {node.type === 'aiBrain' && (
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-[#10A37F] uppercase tracking-wider mb-2">Model</label>
-                    <select value={formData.model || 'gpt-4'} onChange={(e) => handleChange('model', e.target.value)} className="w-full bg-[#1a1a2e] border border-[#333] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#10A37F]">
-                      <option value="gpt-4">GPT-4</option>
-                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                    </select>
+                    <label className="block text-xs font-bold text-[#00e676] uppercase tracking-wider mb-2">Base URL</label>
+                    <input type="text" value={formData.llmBaseUrl || ''} onChange={(e) => handleChange('llmBaseUrl', e.target.value)} placeholder="https://api.openai.com/v1" className="w-full bg-[#1a1a2e] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#00e676]" />
+                    <p className="text-xs text-gray-500 mt-1">Leave empty for default OpenAI, or enter Groq/Anthropic/Ollama URL</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[#10A37F] uppercase tracking-wider mb-2">Prompt</label>
-                    <textarea rows={4} value={formData.prompt || ''} onChange={(e) => handleChange('prompt', e.target.value)} placeholder="Summarize this: {{payload.text}}" className="w-full bg-[#1a1a2e] border border-[#333] rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-[#10A37F]" />
+                    <label className="block text-xs font-bold text-[#00e676] uppercase tracking-wider mb-2">API Key</label>
+                    <input type="password" value={formData.apiKey || ''} onChange={(e) => handleChange('apiKey', e.target.value)} placeholder="sk-..." className="w-full bg-[#1a1a2e] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#00e676]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#00e676] uppercase tracking-wider mb-2">Model Name</label>
+                    <input type="text" value={formData.modelName || ''} onChange={(e) => handleChange('modelName', e.target.value)} placeholder="gpt-4o-mini" className="w-full bg-[#1a1a2e] border border-[#333] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#00e676]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#00e676] uppercase tracking-wider mb-2">System Prompt / Instructions</label>
+                    <textarea rows={4} value={formData.systemPrompt || ''} onChange={(e) => handleChange('systemPrompt', e.target.value)} placeholder="You are a helpful AI Assistant..." className="w-full bg-[#1a1a2e] border border-[#333] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00e676]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#00e676] uppercase tracking-wider mb-2">User Prompt</label>
+                    <textarea rows={3} value={formData.userPrompt || ''} onChange={(e) => handleChange('userPrompt', e.target.value)} placeholder="Translate this text: {{payload.text}}" className="w-full bg-[#1a1a2e] border border-[#333] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00e676]" />
                   </div>
                 </div>
               )}

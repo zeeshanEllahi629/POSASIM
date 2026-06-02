@@ -40,7 +40,7 @@ export default function CategoriesClient({ initialCategories, error }) {
     setFormError("");
 
     try {
-      const res = await fetch("/api/admin/categories", {
+      const res = await fetch("/api/admin2/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -71,7 +71,7 @@ export default function CategoriesClient({ initialCategories, error }) {
     setFormError("");
 
     try {
-      const res = await fetch(`/api/admin/categories/${selectedCategory.id}`, {
+      const res = await fetch(`/api/admin2/categories/${selectedCategory.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -101,7 +101,7 @@ export default function CategoriesClient({ initialCategories, error }) {
     if (!confirm("Are you sure you want to delete this category? All products under it will be disabled.")) return;
 
     try {
-      const res = await fetch(`/api/admin/categories/${id}`, {
+      const res = await fetch(`/api/admin2/categories/${id}`, {
         method: "DELETE",
       });
 
@@ -120,7 +120,7 @@ export default function CategoriesClient({ initialCategories, error }) {
   const handleToggleStatus = async (id, currentStatus) => {
     const nextStatus = currentStatus === 1 ? 2 : 1;
     try {
-      const res = await fetch(`/api/admin/categories/${id}`, {
+      const res = await fetch(`/api/admin2/categories/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_available: nextStatus }),

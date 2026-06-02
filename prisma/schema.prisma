@@ -1217,3 +1217,36 @@ model ai_agent_logs {
   status       String   @db.VarChar(50)
   created_at   DateTime @default(now())
 }
+
+model sync_log {
+  id             Int      @id @default(autoincrement())
+  platform       String   @db.VarChar(50)
+  action         String   @db.VarChar(50)
+  status         String   @db.VarChar(20)
+  target_id      String?  @db.VarChar(100)
+  payload        String?  @db.LongText
+  error_message  String?  @db.LongText
+  created_at     DateTime @default(now())
+}
+
+model marketplace_settings {
+  id             Int      @id @default(autoincrement())
+  client_id      Int?     @default(1)
+  platform       String   @db.VarChar(50)
+  api_key        String?  @db.VarChar(255)
+  api_secret     String?  @db.VarChar(255)
+  access_token   String?  @db.LongText
+  refresh_token  String?  @db.LongText
+  is_active      Int      @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+}
+
+model social_catalog {
+  id             Int      @id @default(autoincrement())
+  item_id        BigInt   @db.UnsignedBigInt
+  platform       String   @db.VarChar(50)
+  platform_id    String?  @db.VarChar(255)
+  sync_status    String   @default("pending") @db.VarChar(20)
+  last_synced    DateTime?
+}

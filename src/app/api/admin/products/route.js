@@ -73,6 +73,25 @@ export async function POST(req) {
       },
     });
 
+    const variationsRaw = formData.get("variations");
+    if (product_type === "variable" && variationsRaw) {
+      try {
+        const parsedVariations = JSON.parse(variationsRaw);
+        if (Array.isArray(parsedVariations) && parsedVariations.length > 0) {
+          const variationsToInsert = parsedVariations.map(v => ({
+            item_id: newItem.id,
+            name: v.name,
+            price: parseFloat(v.price) || 0,
+            qty: parseInt(v.qty) || 0,
+            stock_management: 1
+          }));
+          await prisma.variation.createMany({ data: variationsToInsert });
+        }
+      } catch (e) {
+        console.error("Variation Parsing Error", e);
+      }
+    }
+
     const serialized = JSON.parse(JSON.stringify(newItem, (k, v) => typeof v === "bigint" ? v.toString() : v));
     return NextResponse.json({ status: 1, product: serialized }, { status: 201 });
   } catch (error) {

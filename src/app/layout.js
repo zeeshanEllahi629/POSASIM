@@ -1,37 +1,24 @@
-import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import AiChatWidget from "@/components/front/AiChatWidget";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-});
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Foodefy",
-  description: "Modern POS and Admin dashboard",
+  title: "Foodefy - Complete POS & Website",
+  description: "Next-gen POS system and website platform",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${outfit.variable} ${plusJakartaSans.variable} h-full antialiased`}
-    >
+    <html lang="en">
       <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#00e676" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className={`${inter.className} bg-[#050505] text-white min-h-screen`}>
+        {children}
+        <AiChatWidget />
+      </body>
     </html>
   );
 }

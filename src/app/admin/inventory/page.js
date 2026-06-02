@@ -13,7 +13,7 @@ export default async function AdminInventoryPage() {
   try {
     const itemsList = await prisma.item.findMany({
       where: {
-        is_deleted: 2,
+        item_status: 1,
       },
       orderBy: {
         id: "desc",

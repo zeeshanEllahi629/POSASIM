@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 export default function AddProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [variations, setVariations] = useState([{ name: "", price: "", qty: "" }]);
   
   const [formData, setFormData] = useState({
     item_name: "",
@@ -61,6 +62,20 @@ export default function AddProductPage() {
     }));
   };
 
+  const handleVariationChange = (index, field, value) => {
+    const newVars = [...variations];
+    newVars[index][field] = value;
+    setVariations(newVars);
+  };
+
+  const addVariation = () => {
+    setVariations([...variations, { name: "", price: "", qty: "" }]);
+  };
+
+  const removeVariation = (index) => {
+    setVariations(variations.filter((_, i) => i !== index));
+  };
+
   const handleFileChange = (e) => {
     setFormData(prev => ({ ...prev, image: e.target.files[0] }));
   };
@@ -76,6 +91,10 @@ export default function AddProductPage() {
           data.append(key, formData[key]);
         }
       });
+
+      if (formData.product_type === "variable") {
+        data.append("variations", JSON.stringify(variations));
+      }
 
       const res = await fetch("/api/admin/products", {
         method: "POST",
@@ -207,7 +226,37 @@ export default function AddProductPage() {
 
           {formData.product_type === "variable" && (
             <div className="mt-6 border-t border-[#333] pt-6">
-              <p className="text-gray-400 text-sm mb-4">You can add variations (e.g. Small, Medium, Large) from the Edit Product screen after saving the base product.</p>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white font-semibold text-sm">Product Variations</h3>
+                <button type="button" onClick={addVariation} className="bg-[#00e676]/10 text-[#00e676] px-3 py-1.5 rounded text-xs font-bold hover:bg-[#00e676]/20 transition">
+                  + Add Variation
+                </button>
+              </div>
+              <div className="space-y-3">
+                {variations.map((v, idx) => (
+                  <div key={idx} className="flex items-center gap-3 bg-[#1a1a1a] p-3 rounded-lg border border-[#333]">
+                    <div className="flex-1">
+                      <label className="block text-[10px] text-gray-400 mb-1">Variation Name (e.g. Size Large)</label>
+                      <input type="text" required value={v.name} onChange={(e) => handleVariationChange(idx, "name", e.target.value)} className="w-full bg-[#111] border border-[#333] rounded px-3 py-1.5 text-white text-sm" placeholder="Name" />
+                    </div>
+                    <div className="w-32">
+                      <label className="block text-[10px] text-gray-400 mb-1">Price</label>
+                      <input type="number" step="0.01" required value={v.price} onChange={(e) => handleVariationChange(idx, "price", e.target.value)} className="w-full bg-[#111] border border-[#333] rounded px-3 py-1.5 text-white text-sm" placeholder="0.00" />
+                    </div>
+                    <div className="w-24">
+                      <label className="block text-[10px] text-gray-400 mb-1">Qty</label>
+                      <input type="number" required value={v.qty} onChange={(e) => handleVariationChange(idx, "qty", e.target.value)} className="w-full bg-[#111] border border-[#333] rounded px-3 py-1.5 text-white text-sm" placeholder="0" />
+                    </div>
+                    {variations.length > 1 && (
+                      <div className="flex items-end pb-[2px]">
+                        <button type="button" onClick={() => removeVariation(idx)} className="w-8 h-8 flex items-center justify-center rounded bg-[#ff1744]/10 text-[#ff1744] hover:bg-[#ff1744]/20">
+                          <i className="fas fa-trash text-xs"></i>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

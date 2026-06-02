@@ -13,6 +13,7 @@ export default function AdminLayout({ children }) {
   const [permissions, setPermissions] = useState([]);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loadingPerms, setLoadingPerms] = useState(true);
+  const [themeMode, setThemeMode] = useState("dark");
 
   // Load user data from token if stored in cookie/localStorage or just decode it
   useEffect(() => {
@@ -47,7 +48,27 @@ export default function AdminLayout({ children }) {
         console.error(err);
         setLoadingPerms(false);
       });
+
+    // Load Theme Preference
+    const savedTheme = localStorage.getItem("adminTheme") || "dark";
+    setThemeMode(savedTheme);
+    if (savedTheme === "light") {
+      document.body.classList.add("light-theme");
+    } else {
+      document.body.classList.remove("light-theme");
+    }
   }, []);
+
+  const toggleTheme = () => {
+    const newTheme = themeMode === "dark" ? "light" : "dark";
+    setThemeMode(newTheme);
+    localStorage.setItem("adminTheme", newTheme);
+    if (newTheme === "light") {
+      document.body.classList.add("light-theme");
+    } else {
+      document.body.classList.remove("light-theme");
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -89,6 +110,8 @@ export default function AdminLayout({ children }) {
     { name: "AI Agents", path: "/admin/ai-agents", icon: "fa-robot", reqPerm: "ALL" },
     { name: "Suppliers", path: "/admin/suppliers", icon: "fa-truck", reqPerm: "View all supplier" },
     { name: "Branches", path: "/admin/branches", icon: "fa-store", reqPerm: "ALL" },
+    { name: "SaaS Omnichannel Sync", path: "/admin/sync-settings", icon: "fa-cloud-upload-alt", reqPerm: "ALL" },
+    { name: "Print Labels", path: "/admin/print-labels", icon: "fa-barcode", reqPerm: "View product" },
     { name: "Settings", path: "/admin/settings", icon: "fa-sliders", reqPerm: "ALL" },
   ];
 
@@ -214,6 +237,15 @@ export default function AdminLayout({ children }) {
             >
               <i className="fas fa-cash-register"></i> POS Terminal
             </Link>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              title={`Switch to ${themeMode === "dark" ? "Light" : "Dark"} Mode`}
+              className="w-10 h-10 rounded-lg border border-[#222] hover:bg-[#111] hover:text-white flex items-center justify-center text-gray-400 relative transition-all"
+            >
+              <i className={`fas ${themeMode === "dark" ? "fa-sun" : "fa-moon"}`}></i>
+            </button>
 
             {/* Notifications Dropdown (Decorative/Static for UI wow factor) */}
             <div className="relative">

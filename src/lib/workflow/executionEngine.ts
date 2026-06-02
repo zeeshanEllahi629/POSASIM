@@ -61,8 +61,14 @@ export class WorkflowEngine {
         console.log(`Executing node: ${node.data.label} (${node.data.type})`);
         let actionStatus = 'success';
         let actionPayload = '';
+        let attempts = 0;
+        const maxAttempts = node.data.retryOnFail ? 3 : 1;
+        let success = false;
+        let lastError = null;
 
-        try {
+        while (attempts < maxAttempts && !success) {
+          attempts++;
+          try {
           // ============================================
           // 1. DATA PROCESSING NODES
           // ============================================
@@ -153,24 +159,68 @@ export class WorkflowEngine {
             const chatId = this.replaceVars(node.data.chatId || '', payload);
             const message = this.replaceVars(node.data.message || '', payload);
             
-            if (botToken && chatId) {
-              console.log(`Sending Telegram message to ${chatId}`);
+            if (botToken && chatId && message) {
+              const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+              const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: message })
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.description || "Telegram API Error");
+              payload = { ...payload, telegram: data };
+            } else {
+              throw new Error("Missing Telegram Bot Token, Chat ID or Message");
             }
-            await new Promise(res => setTimeout(res, 400));
-            payload = { ...payload, telegram: { status: 'message_sent' } };
 
           } else if (node.type === 'discordApp') {
             console.log(`[APP] Executing Discord Webhook`);
             const webhookUrl = this.replaceVars(node.data.webhookUrl || '', payload);
             const content = this.replaceVars(node.data.content || '', payload);
-            if (webhookUrl) console.log(`Sending Discord webhook to ${webhookUrl}`);
-            await new Promise(res => setTimeout(res, 400));
-            payload = { ...payload, discord: { status: 'delivered' } };
+            if (webhookUrl && content) {
+              const res = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+              });
+              if (!res.ok) throw new Error("Discord API Error");
+              payload = { ...payload, discord: { status: 'delivered' } };
+            } else {
+              throw new Error("Missing Discord Webhook URL or Content");
+            }
 
-          } else if (node.type === 'openaiApp') {
-            console.log(`[APP] Executing OpenAI API`);
-            await new Promise(res => setTimeout(res, 1000));
-            payload = { ...payload, openai: { completion: 'Generated text from OpenAI model.' } };
+          } else if (node.type === 'aiBrain') {
+            console.log(`[APP] Executing AI Brain API`);
+            const baseUrl = this.replaceVars(node.data.llmBaseUrl || 'https://api.openai.com/v1', payload);
+            const apiKey = this.replaceVars(node.data.apiKey || '', payload);
+            const model = this.replaceVars(node.data.modelName || 'gpt-3.5-turbo', payload);
+            const sysPrompt = this.replaceVars(node.data.systemPrompt || '', payload);
+            const userPrompt = this.replaceVars(node.data.userPrompt || '', payload);
+
+            if (!apiKey) throw new Error("AI Brain API Key is missing");
+
+            const messages = [];
+            if (sysPrompt) messages.push({ role: "system", content: sysPrompt });
+            if (userPrompt) messages.push({ role: "user", content: userPrompt });
+            else messages.push({ role: "user", content: JSON.stringify(payload) }); // Default to sending payload
+
+            const url = `${baseUrl.replace(/\/$/, '')}/chat/completions`;
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+              },
+              body: JSON.stringify({
+                model: model,
+                messages: messages
+              })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error?.message || "AI API Error");
+            
+            payload = { ...payload, aiBrain: data, aiResponse: data.choices?.[0]?.message?.content };
 
           } else if (node.type === 'shopifyApp') {
             console.log(`[APP] Executing Shopify API`);
@@ -218,27 +268,51 @@ export class WorkflowEngine {
             });
           }
           actionPayload = JSON.stringify(payload);
+          success = true;
 
         } catch (e: any) {
-          console.error(`Error in node ${node.id}:`, e);
-          actionStatus = 'failed';
-          actionPayload = e.message || 'Unknown error';
-          return { success: false, error: `Execution failed at node: ${node.data.label}`, details: e.message };
-        } finally {
-          try {
-             await prisma.ai_agent_logs.create({
-               data: {
-                 workflow_id: workflowId,
-                 node_name: node.data.label || node.type,
-                 action: node.type,
-                 payload: actionPayload.substring(0, 5000),
-                 status: actionStatus
-               }
-             });
-          } catch(dbErr) {
-             console.error("Failed to save agent log", dbErr);
+          lastError = e;
+          if (attempts < maxAttempts) {
+             console.log(`Attempt ${attempts} failed for node ${node.data.label}. Retrying...`);
+             await new Promise(r => setTimeout(r, 1000)); // wait 1s before retry
           }
         }
+      } // End retry while loop
+
+      if (!success) {
+         console.error(`Error in node ${node.id} after ${attempts} attempts:`, lastError);
+         actionStatus = 'failed';
+         actionPayload = lastError?.message || 'Unknown error';
+         
+         // Check Continue on Fail
+         if (!node.data.continueOnFail) {
+            // Log the failure to DB before aborting
+            try {
+               await prisma.ai_agent_logs.create({
+                 data: { workflow_id: workflowId, node_name: node.data.label || node.type, action: node.type, payload: actionPayload.substring(0, 5000), status: actionStatus }
+               });
+            } catch(dbErr) {}
+            return { success: false, error: `Execution failed at node: ${node.data.label}`, details: lastError?.message };
+         } else {
+            console.log(`Continuing execution despite failure (Continue on Fail enabled)`);
+            payload = { ...payload, [`${node.id}_error`]: lastError?.message };
+         }
+      }
+
+      // Finally block equivalent for logging
+      try {
+         await prisma.ai_agent_logs.create({
+           data: {
+             workflow_id: workflowId,
+             node_name: node.data.label || node.type,
+             action: node.type,
+             payload: actionPayload.substring(0, 5000),
+             status: actionStatus
+           }
+         });
+      } catch(dbErr) {
+         console.error("Failed to save agent log", dbErr);
+      }
 
         // --- DETERMINE NEXT NODES ---
         let outgoingEdges = this.edges.filter(e => e.source === node.id);

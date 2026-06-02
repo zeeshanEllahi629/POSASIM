@@ -41,7 +41,7 @@ export const NodeDefinitions = [
   // APP INTEGRATIONS
   { type: "telegramApp", label: "Telegram", category: NodeCategories.APPS, color: "bg-[#2CA5E0]", inputs: 1, outputs: 1, description: "Send messages via Telegram Bot API" },
   { type: "discordApp", label: "Discord", category: NodeCategories.APPS, color: "bg-[#5865F2]", inputs: 1, outputs: 1, description: "Send messages to Discord channels" },
-  { type: "openaiApp", label: "OpenAI", category: NodeCategories.APPS, color: "bg-[#10A37F]", inputs: 1, outputs: 1, description: "Use OpenAI models (GPT-4, etc.)" },
+  { type: "aiBrain", label: "AI Brain", category: NodeCategories.AI, color: "bg-[#10A37F]", inputs: 1, outputs: 1, description: "Connect to ANY LLM Provider (OpenAI, Anthropic, Ollama)" },
   { type: "shopifyApp", label: "Shopify", category: NodeCategories.APPS, color: "bg-[#95BF47]", inputs: 1, outputs: 1, description: "Manage Shopify orders and products" },
 
   // ANNOTATIONS

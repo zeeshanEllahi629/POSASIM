@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 
-export default function UsersClient({ initialUsers, error }) {
+export default function UsersClient({ initialUsers, roles = [], error }) {
   const [users, setUsers] = useState(initialUsers);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("customers");
   
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -16,6 +17,9 @@ export default function UsersClient({ initialUsers, error }) {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [roleId, setRoleId] = useState("");
+  const [userType, setUserType] = useState(2); // 2 = customer, 1 = staff
+  
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -24,6 +28,8 @@ export default function UsersClient({ initialUsers, error }) {
     setEmail("");
     setMobile("");
     setPassword("");
+    setRoleId("");
+    setUserType(activeTab === "staff" ? 1 : 2);
     setFormError("");
     setShowAddModal(true);
   };
@@ -33,6 +39,7 @@ export default function UsersClient({ initialUsers, error }) {
     setName(user.name);
     setEmail(user.email);
     setMobile(user.mobile || "");
+    setRoleId(user.role_id || "");
     setFormError("");
     setShowEditModal(true);
   };
@@ -45,10 +52,17 @@ export default function UsersClient({ initialUsers, error }) {
     setFormError("");
 
     try {
-      const res = await fetch("/api/admin/users", {
+      const res = await fetch("/api/admin2/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, mobile, password }),
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          mobile, 
+          password, 
+          type: userType, 
+          role_id: userType === 1 ? roleId : null 
+        }),
       });
 
       const data = await res.json();
@@ -73,10 +87,13 @@ export default function UsersClient({ initialUsers, error }) {
     setFormError("");
 
     try {
-      const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
+      const payload = { name, email, mobile };
+      if (selectedUser.type === 1) payload.role_id = roleId;
+
+      const res = await fetch(`/api/admin2/users/${selectedUser.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, mobile }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -100,7 +117,7 @@ export default function UsersClient({ initialUsers, error }) {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      const res = await fetch(`/api/admin/users/${id}`, {
+      const res = await fetch(`/api/admin2/users/${id}`, {
         method: "DELETE",
       });
 
@@ -119,7 +136,7 @@ export default function UsersClient({ initialUsers, error }) {
   const handleToggleStatus = async (id, currentStatus) => {
     const nextStatus = currentStatus === 1 ? 2 : 1;
     try {
-      const res = await fetch(`/api/admin/users/${id}`, {
+      const res = await fetch(`/api/admin2/users/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_available: nextStatus }),
@@ -138,12 +155,43 @@ export default function UsersClient({ initialUsers, error }) {
     }
   };
 
-  // Filter list
-  const filtered = users.filter((u) =>
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (u.mobile && u.mobile.includes(searchQuery))
-  );
+  // Approve Staff User
+  const handleApproveStaff = async (id) => {
+    if (!confirm("Approve this staff account?")) return;
+    try {
+      // Typically verified is 1, unverified is 0/2 depending on DB schema
+      const res = await fetch(`/api/admin2/users/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_verified: 1 }), // Or whatever indicates approved
+      });
+      const data = await res.json();
+      if (data.status === 1) {
+        setUsers(users.map(u => u.id === id ? { ...u, is_verified: 1 } : u));
+      } else {
+        alert("Failed to approve");
+      }
+    } catch (err) {
+      alert("Connection error");
+    }
+  };
+
+  // Filter lists
+  const filtered = users.filter((u) => {
+    const matchesSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (u.mobile && u.mobile.includes(searchQuery));
+    
+    // type: 2 = customer, 1 = staff
+    // is_verified is commonly used for approval
+    const isApproved = u.is_verified === 1 || u.is_verified === true;
+    
+    if (activeTab === "customers") return matchesSearch && u.type === 2;
+    if (activeTab === "staff") return matchesSearch && u.type === 1 && isApproved;
+    if (activeTab === "pending") return matchesSearch && u.type === 1 && !isApproved;
+    
+    return matchesSearch;
+  });
 
   return (
     <div className="space-y-6">
@@ -152,6 +200,28 @@ export default function UsersClient({ initialUsers, error }) {
           {error}
         </div>
       )}
+
+      {/* Tabs */}
+      <div className="flex border-b border-[#222]">
+        <button 
+          className={`px-6 py-4 font-semibold text-sm transition-colors ${activeTab === 'customers' ? 'text-[#00e676] border-b-2 border-[#00e676]' : 'text-gray-400 hover:text-white'}`}
+          onClick={() => setActiveTab('customers')}
+        >
+          Customers
+        </button>
+        <button 
+          className={`px-6 py-4 font-semibold text-sm transition-colors ${activeTab === 'staff' ? 'text-[#00e676] border-b-2 border-[#00e676]' : 'text-gray-400 hover:text-white'}`}
+          onClick={() => setActiveTab('staff')}
+        >
+          Active Staff
+        </button>
+        <button 
+          className={`px-6 py-4 font-semibold text-sm transition-colors ${activeTab === 'pending' ? 'text-[#00e676] border-b-2 border-[#00e676]' : 'text-gray-400 hover:text-white'}`}
+          onClick={() => setActiveTab('pending')}
+        >
+          Pending Approvals
+        </button>
+      </div>
 
       {/* ========== HEADER CONTROL BAR ========== */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#111111]/60 border border-[#222222] p-4 rounded-2xl">
@@ -165,12 +235,14 @@ export default function UsersClient({ initialUsers, error }) {
             className="w-full pl-11 pr-4 py-2.5 bg-[#080808] border border-[#222222] rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-[#00e676]/50 focus:ring-1 focus:ring-[#00e676]/30 transition-all text-sm"
           />
         </div>
-        <button
-          onClick={handleOpenAddModal}
-          className="bg-[#00e676] text-[#0d0d0d] hover:bg-[#00c853] py-2.5 px-5 rounded-xl font-bold text-sm tracking-wide transition-all shadow-lg shadow-[#00e676]/10 flex items-center justify-center gap-2"
-        >
-          <i className="fas fa-plus"></i> Add User
-        </button>
+        {activeTab !== "pending" && (
+          <button
+            onClick={handleOpenAddModal}
+            className="bg-[#00e676] text-[#0d0d0d] hover:bg-[#00c853] py-2.5 px-5 rounded-xl font-bold text-sm tracking-wide transition-all shadow-lg shadow-[#00e676]/10 flex items-center justify-center gap-2"
+          >
+            <i className="fas fa-plus"></i> Add {activeTab === "staff" ? "Staff" : "User"}
+          </button>
+        )}
       </div>
 
       {/* ========== USERS LIST TABLE ========== */}
@@ -182,7 +254,8 @@ export default function UsersClient({ initialUsers, error }) {
                 <th className="py-4 px-6">Name</th>
                 <th className="py-4 px-6">Email</th>
                 <th className="py-4 px-6">Mobile</th>
-                <th className="py-4 px-6">Status</th>
+                {activeTab === "staff" && <th className="py-4 px-6">Role</th>}
+                {activeTab !== "pending" && <th className="py-4 px-6">Status</th>}
                 <th className="py-4 px-6 text-right">Actions</th>
               </tr>
             </thead>
@@ -211,37 +284,66 @@ export default function UsersClient({ initialUsers, error }) {
                   <td className="py-4 px-6 font-mono text-gray-500">
                     {user.mobile || "-"}
                   </td>
-                  <td className="py-4 px-6">
-                    <button
-                      onClick={() => handleToggleStatus(user.id, user.is_available)}
-                      className={`px-3 py-1 rounded-full border text-[10px] font-bold transition-all ${
-                        user.is_available === 1
-                          ? "bg-green-950/20 border-green-500/20 text-[#00e676]"
-                          : "bg-red-950/20 border-red-500/20 text-[#ff1744]"
-                      }`}
-                    >
-                      {user.is_available === 1 ? "Active" : "Inactive"}
-                    </button>
-                  </td>
+                  
+                  {activeTab === "staff" && (
+                    <td className="py-4 px-6 text-blue-400 font-semibold">
+                      {roles.find(r => r.id === user.role_id)?.name || "No Role"}
+                    </td>
+                  )}
+
+                  {activeTab !== "pending" && (
+                    <td className="py-4 px-6">
+                      <button
+                        onClick={() => handleToggleStatus(user.id, user.is_available)}
+                        className={`px-3 py-1 rounded-full border text-[10px] font-bold transition-all ${
+                          user.is_available === 1
+                            ? "bg-green-950/20 border-green-500/20 text-[#00e676]"
+                            : "bg-red-950/20 border-red-500/20 text-[#ff1744]"
+                        }`}
+                      >
+                        {user.is_available === 1 ? "Active" : "Inactive"}
+                      </button>
+                    </td>
+                  )}
+
                   <td className="py-4 px-6 text-right space-x-2">
-                    <button
-                      onClick={() => handleOpenEditModal(user)}
-                      className="px-2.5 py-1.5 bg-[#1c1c1c] border border-[#333] hover:border-gray-500 rounded-lg text-gray-300 hover:text-white transition-all"
-                    >
-                      <i className="fas fa-edit"></i> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="px-2.5 py-1.5 bg-red-950/10 border border-red-950/30 text-[#ff1744] hover:bg-[#ff1744]/15 rounded-lg transition-all"
-                    >
-                      <i className="fas fa-trash-alt"></i> Delete
-                    </button>
+                    {activeTab === "pending" ? (
+                      <>
+                        <button
+                          onClick={() => handleApproveStaff(user.id)}
+                          className="px-2.5 py-1.5 bg-[#00e676]/10 border border-[#00e676]/30 text-[#00e676] hover:bg-[#00e676]/20 rounded-lg transition-all"
+                        >
+                          <i className="fas fa-check"></i> Approve
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="px-2.5 py-1.5 bg-red-950/10 border border-red-950/30 text-[#ff1744] hover:bg-[#ff1744]/15 rounded-lg transition-all"
+                        >
+                          <i className="fas fa-times"></i> Reject
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleOpenEditModal(user)}
+                          className="px-2.5 py-1.5 bg-[#1c1c1c] border border-[#333] hover:border-gray-500 rounded-lg text-gray-300 hover:text-white transition-all"
+                        >
+                          <i className="fas fa-edit"></i> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="px-2.5 py-1.5 bg-red-950/10 border border-red-950/30 text-[#ff1744] hover:bg-[#ff1744]/15 rounded-lg transition-all"
+                        >
+                          <i className="fas fa-trash-alt"></i> Delete
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="text-center py-12 text-gray-500">
+                  <td colSpan="6" className="text-center py-12 text-gray-500">
                     No users found
                   </td>
                 </tr>
@@ -258,7 +360,7 @@ export default function UsersClient({ initialUsers, error }) {
           <div className="relative bg-[#111111] border border-[#222] rounded-2xl w-full max-w-md overflow-hidden flex flex-col z-10">
             <div className="p-5 border-b border-[#222] flex items-center justify-between">
               <h3 className="text-base font-bold flex items-center gap-2">
-                <i className="fas fa-user-plus text-[#00e676]"></i> Add New User
+                <i className="fas fa-user-plus text-[#00e676]"></i> Add New {activeTab === "staff" ? "Staff" : "User"}
               </h3>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-white">
                 <i className="fas fa-times"></i>
@@ -273,9 +375,7 @@ export default function UsersClient({ initialUsers, error }) {
 
             <form onSubmit={handleAddUser} className="p-6 space-y-4">
               <div className="form-group">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Full Name
-                </label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
                 <input
                   type="text"
                   required
@@ -287,9 +387,7 @@ export default function UsersClient({ initialUsers, error }) {
               </div>
 
               <div className="form-group">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Email Address
-                </label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
                 <input
                   type="email"
                   required
@@ -301,9 +399,7 @@ export default function UsersClient({ initialUsers, error }) {
               </div>
 
               <div className="form-group">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Mobile Number
-                </label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Mobile Number</label>
                 <input
                   type="text"
                   required
@@ -314,10 +410,25 @@ export default function UsersClient({ initialUsers, error }) {
                 />
               </div>
 
+              {activeTab === "staff" && (
+                <div className="form-group">
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Assign Role</label>
+                  <select
+                    value={roleId}
+                    onChange={(e) => setRoleId(e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 text-sm"
+                  >
+                    <option value="">Select a Role</option>
+                    {roles.map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="form-group">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Password
-                </label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
                 <input
                   type="password"
                   required
@@ -371,46 +482,54 @@ export default function UsersClient({ initialUsers, error }) {
 
             <form onSubmit={handleEditUser} className="p-6 space-y-4">
               <div className="form-group">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Full Name
-                </label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. John Doe"
                   className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-[#00e676]/50 text-sm"
                 />
               </div>
 
               <div className="form-group">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Email Address
-                </label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. user@example.com"
                   className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-[#00e676]/50 text-sm"
                 />
               </div>
 
               <div className="form-group">
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Mobile Number
-                </label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Mobile Number</label>
                 <input
                   type="text"
                   required
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
-                  placeholder="e.g. +1234567890"
                   className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-[#00e676]/50 text-sm"
                 />
               </div>
+
+              {selectedUser?.type === 1 && (
+                <div className="form-group">
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Assign Role</label>
+                  <select
+                    value={roleId}
+                    onChange={(e) => setRoleId(e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 bg-[#050505] border border-[#222] rounded-xl text-white focus:outline-none focus:border-[#00e676]/50 text-sm"
+                  >
+                    <option value="">Select a Role</option>
+                    {roles.map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="pt-4 flex gap-3 border-t border-[#222] mt-6">
                 <button

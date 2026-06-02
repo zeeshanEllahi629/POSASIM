@@ -39,8 +39,32 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { category_name, image } = body;
+    const contentType = req.headers.get("content-type") || "";
+    let category_name = "";
+    let imageName = "default.png";
+
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      category_name = formData.get("category_name");
+      const imageFile = formData.get("image");
+
+      if (imageFile && imageFile.name) {
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const path = await import("path");
+        const fs = await import("fs");
+        
+        const ext = path.extname(imageFile.name);
+        imageName = Date.now().toString() + "-" + Math.floor(Math.random() * 1000).toString() + ext;
+        const uploadDir = path.join(process.cwd(), "public/storage/app/public/admin-assets/images/category");
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+        fs.writeFileSync(path.join(uploadDir, imageName), buffer);
+      }
+    } else {
+      const body = await req.json();
+      category_name = body.category_name;
+      if (body.image) imageName = body.image;
+    }
 
     if (!category_name) {
       return NextResponse.json({ status: 0, error: "Category name is required" }, { status: 400 });
@@ -56,7 +80,7 @@ export async function POST(req) {
 
     if (existing) {
       const count = await prisma.categories.count();
-      slug = `${slug}-${count + 1}`;
+      slug = slug + "-" + (count + 1).toString();
     }
 
     // Get max reorder_id
@@ -72,7 +96,7 @@ export async function POST(req) {
       data: {
         category_name,
         slug,
-        image: image || "default.png",
+        image: imageName,
         reorder_id: nextReorderId,
         is_available: 1,
         is_deleted: 2,
