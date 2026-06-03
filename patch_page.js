@@ -1,4 +1,6 @@
-import prisma from "@/lib/prisma";
+const fs = require('fs');
+
+const code = `import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/front/Footer";
@@ -141,8 +143,8 @@ export default async function Home() {
             ].map((feature, i) => (
               <div key={i} className="glass-card p-10 rounded-3xl hover:-translate-y-3 transition-all duration-500 group relative overflow-hidden border border-[#222]">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors"></div>
-                <div className={`w-20 h-20 rounded-2xl ${feature.bg} ${feature.color} flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500 ${feature.shadow}`}>
-                  <i className={`fa-solid ${feature.icon}`}></i>
+                <div className={`w-20 h-20 rounded-2xl \${feature.bg} \${feature.color} flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500 \${feature.shadow}`}>
+                  <i className={\`fa-solid \${feature.icon}\`}></i>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4 tracking-wide">{feature.title}</h3>
                 <p className="text-gray-400 leading-relaxed text-lg">{feature.desc}</p>
@@ -155,12 +157,15 @@ export default async function Home() {
 
       <Footer />
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{__html: \`
         @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
-      `}} />
+      \`}} />
     </div>
   );
-}
+}`;
+
+fs.writeFileSync('src/app/(front)/page.js', code);
+console.log('Done writing front page!');

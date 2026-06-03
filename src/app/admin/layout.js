@@ -116,9 +116,11 @@ export default function AdminLayout({ children }) {
     { name: "Import Product", path: "/admin/sourcing/import", icon: "fa-file-import", reqPerm: "ALL" },
     { name: "Sourcing Orders", path: "/admin/sourcing/orders", icon: "fa-box-open", reqPerm: "ALL" },
     { name: "Shipments", path: "/admin/sourcing/tracking", icon: "fa-shipping-fast", reqPerm: "ALL" },
+    { name: "Marketplaces", path: "/admin/marketplaces", icon: "fa-store-alt", reqPerm: "ALL" },
     { name: "Print Labels", path: "/admin/print-labels", icon: "fa-barcode", reqPerm: "View product" },
     { name: "Theme Settings", path: "/admin/theme-settings", icon: "fa-paint-brush", reqPerm: "ALL" },
     { name: "Settings", path: "/admin/settings", icon: "fa-sliders", reqPerm: "ALL" },
+    { name: "Help & Docs", path: "/admin/help", icon: "fa-circle-question", reqPerm: "ALL" },
   ];
 
   // Filter items based on permissions

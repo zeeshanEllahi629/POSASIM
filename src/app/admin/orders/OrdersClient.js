@@ -154,6 +154,38 @@ export default function OrdersClient({ initialOrders, error }) {
               ))}
             </select>
           </div>
+          
+          <div className="flex justify-end mt-4 sm:mt-0 sm:col-span-3">
+             <button
+              onClick={() => {
+                const csvContent = [
+                  ['Order Number', 'Date', 'Customer Name', 'Channel', 'Grand Total', 'Payment Status', 'Order Status'],
+                  ...orders.map(o => [
+                    o.order_number, 
+                    o.created_at, 
+                    o.name || 'Walk-in', 
+                    o.is_pos_order === 1 ? 'POS' : 'Online', 
+                    o.grand_total, 
+                    o.payment_status, 
+                    o.status
+                  ])
+                ].map(e => e.join(",")).join("\n");
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "orders_export.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="bg-[#1c1c1c] text-white hover:bg-[#222222] border border-[#333] py-2.5 px-4 rounded-xl font-bold text-sm tracking-wide transition-all shadow-lg flex items-center justify-center gap-2"
+            >
+              <i className="fas fa-file-export text-blue-500"></i> Export Orders
+            </button>
+          </div>
         </div>
       </div>
 

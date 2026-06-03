@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
+import Autocomplete from "react-google-autocomplete";
 
 export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
@@ -282,14 +283,31 @@ export default function CheckoutPage() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-bold text-zinc-400 mb-2">Street Address *</label>
-                    <input 
-                      type="text" 
-                      name="address"
-                      required
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-lg bg-[#222] text-white border border-[#333] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow placeholder-zinc-500" 
-                      placeholder="123 Main St, Apt 4B"
+                    <Autocomplete
+                      apiKey="YOUR_GOOGLE_MAPS_API_KEY_HERE"
+                      onPlaceSelected={(place) => {
+                        let zipCode = formData.zipCode;
+                        let city = formData.city;
+                        if (place.address_components) {
+                          const zipComponent = place.address_components.find(c => c.types.includes("postal_code"));
+                          if (zipComponent) zipCode = zipComponent.long_name;
+                          const cityComponent = place.address_components.find(c => c.types.includes("locality"));
+                          if (cityComponent) city = cityComponent.long_name;
+                        }
+                        setFormData(prev => ({
+                          ...prev,
+                          address: place.formatted_address || place.name,
+                          zipCode,
+                          city
+                        }));
+                      }}
+                      options={{
+                        types: ["geocode", "establishment"],
+                      }}
+                      defaultValue={formData.address}
+                      onChange={(e) => handleInputChange({ target: { name: 'address', value: e.target.value } })}
+                      className="w-full px-4 py-3 rounded-lg bg-[#222] text-white border border-[#333] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow placeholder-zinc-500"
+                      placeholder="Start typing to search address..."
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

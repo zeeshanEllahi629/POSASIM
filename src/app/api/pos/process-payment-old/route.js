@@ -60,9 +60,6 @@ export async function POST(req) {
           name: data.customer_name || "Walk-in Customer",
           mobile: data.customer_phone ? BigInt(data.customer_phone.replace(/\D/g, "")) : null,
           email: data.customer_email || "",
-          address: data.customer_address || null,
-          postal_code: data.customer_postal_code || null,
-          driver_id: data.driver_id ? parseInt(data.driver_id) : null,
           transaction_type: (data.payment_method || 1).toString(), // 1=Cash, 2=Card, 5=Split
           tax_amount: (data.tax_amount || 0).toString(),
           discount_amount: (data.discount_amount || 0).toString(),

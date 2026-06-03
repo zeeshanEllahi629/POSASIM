@@ -38,8 +38,8 @@ export default function Navbar({ cartStyle = "sidebar", logo }) {
 
   return (
     <>
-      <header className="bg-[#111] shadow-md border-b border-[#222] sticky top-0 z-50">
-        <nav className="container mx-auto px-4 lg:px-8 py-3 flex items-center justify-between">
+      <header className="glass shadow-md sticky top-0 z-50 border-b border-[#222]/50 transition-all duration-300">
+        <nav className="container mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Mobile Menu Toggle */}
             <button
